@@ -150,14 +150,18 @@ La structure du dépôt git doit être la suivante :
 ├── README.md
 ├── .gitignore
 ├── deps/
+    ├── hamcrest-core-1.3.jar
+    ├── junit-4.13.1.jar
+├── out/
+    ├── .gitkeep
 ├── src/
     ├── Main.java
     ├── ...
 ├── tests/
+    ├── ...
 ├── uml/
     ├── semaine1.puml
     ├──...
-├── out/
 ```
 
 
