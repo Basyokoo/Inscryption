@@ -13,15 +13,15 @@ _Vous vous retrouvez dans une cabane, perdu en pleine forêt. Dans l'obscurité,
 - Chaque carte dispose
   - d'un nombre de points d'attaque
   - d'un nombre de points de vie,
-  - d'un nombre de vos cartes à sacrifier pour pouvoir être placée sur le plateau (nombre de gouttes de sang)
+  - d'un nombre de vos cartes sur le plateau à sacrifier pour pouvoir être placée sur le plateau (nombre de gouttes de sang)
   - d'un nombre de vos cartes déjà mortes (tuées ou sacrifiées) pour pouvoir être placée sur le plateau (nombre d'os)
 
 Chacune des cartes peut apparaitre en plusieurs exemplaires dans la pioche, dans la main et sur le plateau.
 
 ### Déroulement d'un tour
-- Au début de votre tour, votre adversaire indique quelles cartes il jouera au tour prochain (représentés par une ligne supplémentaire de 4 emplacements de cartes  au-dessus du plateau)
+- Au début de votre tour, votre adversaire indique quelles cartes il jouera au tour prochain (représentés par une ligne supplémentaire de 4 emplacements de cartes au-dessus du plateau)
 - A chaque tour, vous pouvez piocher une seule carte que vous placez dans votre main,
-- Vous pouvez placer autant de cartes de votre par tour sur le plateau, dans la limite du nombre d'emplacements de cartes disponibles sur votre côté du plateau (au maximum 4) et en respectant les sacrifices à réaliser
+- Vous pouvez placer autant de cartes de votre main par tour sur le plateau, dans la limite du nombre d'emplacements de cartes disponibles sur votre côté du plateau (au maximum 4) et en respectant les sacrifices à réaliser
 - A la fin de votre tour, chacune de vos cartes "animal" attaque. Si une carte de votre adversaire fait face à la carte attaquante, la carte de votre adversaire perd en nombre de points de vie le nombre de points d'attaque de votre carte. 
 Si au contraire, aucune carte de votre adversaire ne se trouve face à une de vos cartes, le score est augmenté en votre faveur du nombre de points d'attaque de votre carte.
 Les cartes "animal" volantes attaquent directement le score même si une carte adverse se trouve en face d'elle.
