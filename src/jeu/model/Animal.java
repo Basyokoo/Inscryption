@@ -5,10 +5,10 @@ public class Animal extends Carte{
     protected int m_coutSang;
     protected int m_coutOs;
     protected boolean m_volatile;
+    protected String m_type = "ANI";
     // Création du constructeur
     public Animal(String nom, int pV, int pointsAttaque, int sang, int os, boolean volant) {
-        super(nom);
-        super(pV);
+        super(nom,pV,m_type);
         this.m_pointsAttaque = pointsAttaque;
         this.m_coutSang = sang;
         this.m_coutOs = os;
