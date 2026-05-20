@@ -33,4 +33,9 @@ public abstract class Carte {
     public boolean estVie(){
         return this.m_pointsVies != 0;
     }
+
+    @Override
+    public String toString(){
+        return this.m_nom;
+    }
 }
