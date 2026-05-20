@@ -7,8 +7,7 @@ public class Animal extends Carte{
     protected boolean m_volatile;
     // Création du constructeur
     public Animal(String nom, int pV, int pointsAttaque, int sang, int os, boolean volant) {
-        super(nom);
-        super(pV);
+        super(nom, pV);
         this.m_pointsAttaque = pointsAttaque;
         this.m_coutSang = sang;
         this.m_coutOs = os;
