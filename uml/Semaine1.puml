@@ -23,7 +23,7 @@ package jeu {
             + lancerJeu()
         }
         class Score {
-            - m_valeurEcart : Integer
+            - m_score : Integer
             + <<create>> Score()
             + ajouterPointsJoueur(points : Integer)
             + ajouterPointsEnnemi(points : Integer)
@@ -48,6 +48,7 @@ package jeu {
             + getVie() : Integer
             + setPV(pv : Integer)
             + estVivant() : Boolean
+            + toString() : String
         }
 
         class Animal extends Carte {
@@ -73,7 +74,8 @@ package jeu {
             + <<create>> Plateau()
             + placerCarteJoueur(carte : Carte, position : Integer) : Boolean
             + placerCarteEnnemi(carte : Carte, position : Integer) : Boolean
-            + avancerLigneProchainTour() : Boolean
+            + avancerLigne() : Boolean
+            + placerObst() : Boolean
             + getCarteJoueur(position : Integer) : Carte
             + getCarteEnnemi(position : Integer) : Carte
         }
@@ -112,6 +114,7 @@ package jeu {
 
     package view {
         class AffichageConsole {
+            - m_tableauCaractere : ArrayList<ArrayList<Caractere>>
             + afficherPlateau(plateau : Plateau, score : Integer, pioche : Pioche, main : MainJoueur)
             + afficherMessageDegats(messages : String)
             + afficherErreurSaisie(message : String)
@@ -122,11 +125,11 @@ package jeu {
 ' --- Relations et Dépendances ---
 Main .> GestionPartie : <<call>>
 
-GestionPartie *--> Plateau
-GestionPartie *--> Pioche
-GestionPartie *--> MainJoueur
-GestionPartie *--> Joueur
-GestionPartie *--> Adversaire
+GestionPartie *--> Plateau : m_plat <
+GestionPartie *--> Pioche : m_pioche <
+GestionPartie *--> MainJoueur : m_main <
+GestionPartie *--> Joueur : m_j <
+GestionPartie *--> Adversaire : m_adv <
 GestionPartie ..> Combat : <<use>>
 GestionPartie ..> Score : <<use>>
 GestionPartie ..> AffichageConsole : <<use>>

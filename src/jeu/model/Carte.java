@@ -21,7 +21,7 @@ public abstract class Carte {
         if(n < 0){
             this.m_pointsVies += n;
             return "Dégats subit : " + n + ".";
-        }else{
+        }else if(n > this.m_pointsVies){
             this.m_pointsVies = n;
             return "Point de mis à : " + n + ".";
         }
@@ -30,5 +30,10 @@ public abstract class Carte {
 
     public boolean estVie(){
         return this.m_pointsVies != 0;
+    }
+
+    @Override
+    public String toString(){
+        return this.m_nom;
     }
 }
