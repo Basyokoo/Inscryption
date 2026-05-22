@@ -43,18 +43,18 @@ public class Combat {
         return degatsInfliges;
     }
     public Integer appliquerDegats(Animal attaquant, Carte cible, Integer position) {
-        if (attaquant == null || attaquant.getPointsAttaque() <= 0) {
+        if (attaquant == null || attaquant.getAttack() <= 0) {
             return 0;
         }
         if (position < 0 || position > 3) {
             return 0;
         }
-        int puissance = attaquant.getPointsAttaque();
+        int puissance = attaquant.getAttack();
         if (cible != null && cible.estVie()) {
             if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
                 return puissance;
             }
-            cible.setPv(cible.getVie() - puissance);
+            cible.modifierVie(cible.getVie() - puissance);
         }
         return puissance;
     }
