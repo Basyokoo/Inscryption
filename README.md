@@ -115,6 +115,56 @@ $ placer 2 B1
 ```
 Il n'est pas nécessaire de reproduire le visuel tel quel mais toutes les informations doivent être présentes.
 
+
+## Phase 2
+
+### Pouvoirs 
+- Nombreuses vies : reste vivant sur le plateau lorsqu'elle est sacrifiée
+- Croissance : se transforme en loup au début du deuxième tour, où il est sur le plateau
+- Puant : réduit de 1 l'attaque de la carte lui faisant face
+- Coureur : se déplace vers d'un emplacement vers la droite après son attaque. Si l'emplacement vers la droite est bloquée, se déplace vers la gauche. Si les emplacements vers la gauche et la droite sont bloquées ne se déplace pas.
+- Contact Mortel: s'il inflige des dégâts à une autre créature (donc pas à un obstacle), la créature blessée meurt 
+- Piques pointues : inflige 1 point de dégât à la carte attaquante lorsqu'il est attaqué par une carte
+
+Le nom des pouvoirs doit être affiché sur les cartes
+
+Chacun des pouvoirs doit être testé.
+
+### Cartes déjà présentes dans la phase 1
+Nom | Attaque      | Points de vie  | Gouttes de sang  | Os | Volant ? | Pouvoir
+-------- |---------|---------|---------|----------------|-----|-----------|
+Chat |0  |1  | 1  | 0         | non | Nombreuses Vies
+Grizzly | 4| 6 | 3| 0 | non |
+Coyote | 2 | 1 | 0 |4 | non |
+Moineau | 1 | 2 | 1 | 0 | oui |
+Corbeau |2 | 3| 2 | 0 | oui |
+Ecureuil | 0 | 1 | 0 | 0 | non |
+Hermine | 1 | 3 | 1 |0 | non |
+Louveteau | 1| 1 | 1 |0  | non | Croissance
+Loup |3 | 2 | 2 |0  | non |
+Punaise | 1 | 2 | 0 | 2 | non |Puant
+
+### Liste des cartes obstacles
+Nom | Points de vie      |
+-------- |---------|
+Rocher | 5         |     
+Sapin | 3  |
+
+### Nouvelles cartes 
+
+Nom | Attaque      | Points de vie  | Gouttes de sang | Os | Volant ? | Pouvoir
+-------- |---------|---------|--------|----------------|-----|-----------|
+Elan |2 | 4 | 2 | 0 | Non | Coureur
+Vipère | 1 |1| 2 | 0 | Non | Contact mortel
+Porc-épic | 1 | 2| 1 | 0 | Non | Piques pointues
+
+
+### Pierre de sacrifice
+A la fin du tour 2, après avoir choisi une nouvelle carte. Le joueur doit sacrifier une carte, il récupère alors son pouvoir (si la carte en possède) et peut l'ajouter à une autre carte animal.
+
+
+
+
 ## Organisation
 
 - Travail en **binôme** au sein d'un même groupe de TP
@@ -181,6 +231,8 @@ Afin de démontrer le bon fonctionnement de votre application, vous devrez écri
 Vous testerez en particulier : 
 - l'attaque d'une carte,
 - l'attaque des toutes les cartes à la fin d'un tour,
+- les pouvoirs,
+- le mécanisme de la pierre de sacrifice,
 - la mise à jour du score,
 - le placement des cartes sur le plateau
 - le fait de piocher une carte,
