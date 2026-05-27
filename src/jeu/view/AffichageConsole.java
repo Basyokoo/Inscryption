@@ -208,8 +208,12 @@ public class AffichageConsole {
             m_screen.clear();
         }
     }
+<<<<<<< HEAD
+}
+=======
 
     public void finScreen(){
         return;
     }
 }
+>>>>>>> 9f1d570cc03df1c8db49f2b63f6abce095a9890b
