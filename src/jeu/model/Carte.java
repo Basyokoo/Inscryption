@@ -28,7 +28,7 @@ public abstract class Carte {
     }
 
     public String modifierVie(int changement) {
-        this.m_pointsVies += changement;
+        this.m_pointsVies -= changement;
 
         if (this.m_pointsVies < 0) {
             this.m_pointsVies = 0;
