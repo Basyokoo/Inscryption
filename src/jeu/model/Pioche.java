@@ -15,7 +15,9 @@ public class Pioche {
         if (m_cartes.isEmpty()) {
             return null;
         }
-        return m_cartes.remove(0);
+        Animal tempCarte = new Animal(m_cartes.get(0));
+        m_cartes.remove(0);
+        return tempCarte;
     }
     public void ajouterCartes(Animal carte) {
         m_cartes.add(carte);

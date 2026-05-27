@@ -6,6 +6,13 @@ public class Animal extends Carte{
     protected int m_coutOs;
     protected boolean m_volatile;
 
+    public Animal(Animal ani){
+        super(ani.getNom(), ani.getVie(), "ANI");
+        this.m_pointsAttaque = ani.getAttack();
+        this.m_coutOs = ani.getCoutOs();
+        this.m_coutSang = ani.getCoutSang();
+        this.m_volatile = ani.getVolant();
+    }
     public Animal(String nom, int pV, int pointsAttaque, int sang, int os, boolean volant) {
         super(nom,pV,"ANI");
         this.m_pointsAttaque = pointsAttaque;
