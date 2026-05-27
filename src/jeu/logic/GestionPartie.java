@@ -18,6 +18,12 @@ public class GestionPartie {
         this.m_numPartie = 0;
         this.m_victoire = 0;
         this.m_numTour = 0;
+        this.m_main = new MainJoueur();
+        this.m_plat = new Plateau();
+        this.m_adv = new Adversaire();
+        this.m_affichage = new AffichageConsole();
+        this.m_pioche = new Pioche();
+        this.m_j = new Joueur();
     }
 
     public boolean lancerJeu(){

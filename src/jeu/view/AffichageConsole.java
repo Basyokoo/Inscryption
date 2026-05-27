@@ -16,7 +16,7 @@ public class AffichageConsole {
     static final int m_SIZE_DECALAGE = 3;
     static final int m_HAUTEUR_CARTE = 7;
     static final int m_LARGEUR_ECRAN = m_SIZE_CARTE * 4 + m_SIZE_DECALAGE * 3 + 10;
-    static final int m_HAUTEUR_ECRAN = m_HAUTEUR_CARTE * 4 + 10;
+    static final int m_HAUTEUR_ECRAN = m_HAUTEUR_CARTE * 3 + 2 + 15;
 
     private Screen m_screen;
     private TextGraphics m_graphics;
@@ -45,40 +45,55 @@ public class AffichageConsole {
     public void dessinerJeuComplet(Plateau plateau, MainJoueur main, int score) {
         this.effacer();
 
-        int empIntention = 0;
-        for (Carte c : plateau.getCartesIntentions()) {
+        int ligneIntentions = 1;
+        int ligneAdverse    = ligneIntentions + m_HAUTEUR_CARTE + 1;  // = 9
+        int ligneJoueur     = ligneAdverse    + m_HAUTEUR_CARTE + 1;  // = 17
+
+        // Ligne intentions adversaire (A1-A4)
+        for (int i = 0; i < 4; i++) {
+            Carte c = plateau.getCartesIntentions().get(i);
             if (c != null) {
-                this.dessineCarte(c, 1, empIntention); // Ligne de texte 1
+                this.dessineCarte(c, ligneIntentions, i);
+            } else {
+                this.dessinerCaseVide("A" + (i + 1), ligneIntentions, i);
             }
-            empIntention++;
         }
 
-        int empAdv = 0;
-        for (Carte c : plateau.getCartesLigneHaut()) {
+        // Ligne adversaire (A1-A4)
+        for (int i = 0; i < 4; i++) {
+            Carte c = plateau.getCartesLigneHaut().get(i);
             if (c != null) {
-                this.dessineCarte(c, 5, empAdv); // Ligne 5 par exemple
+                this.dessineCarte(c, ligneAdverse, i);
+            } else {
+                this.dessinerCaseVide("A" + (i + 1), ligneAdverse, i);
             }
-            empAdv++;
         }
 
-        int empJoueur = 0;
-        for (Carte c : plateau.getCartesLigneBas()) {
+        // Ligne joueur (B1-B4)
+        for (int i = 0; i < 4; i++) {
+            Carte c = plateau.getCartesLigneBas().get(i);
             if (c != null) {
-                this.dessineCarte(c, 12, empJoueur); // Ligne 12 pour laisser de l'espace
+                this.dessineCarte(c, ligneJoueur, i);
+            } else {
+                this.dessinerCaseVide("B" + (i + 1), ligneJoueur, i);
             }
-            empJoueur++;
         }
 
-        this.m_graphics.putString(2, 20, "Score balance : " + score);
-        this.m_graphics.putString(2, 22, "Votre main :");
+        int ligneScore = ligneJoueur + m_HAUTEUR_CARTE + 1;  // = 25
+        this.m_graphics.putString(2, ligneScore,     "Score balance : " + score);
+        this.m_graphics.putString(2, ligneScore + 2, "Votre main :");
 
-        int ligneTexteMain = 23;
+        int ligneTexteMain = ligneScore + 3;
         int numeroCarte = 1;
-        for (Carte c : main.getCartesEnMain()) {
-            String infoMain = String.format("  %d. %-10s PV: %d", numeroCarte, c.getNom(), c.getVie());
-            this.m_graphics.putString(2, ligneTexteMain, infoMain);
-            ligneTexteMain++;
-            numeroCarte++;
+        if (main.getCartesEnMain() != null) {
+            for (Carte c : main.getCartesEnMain()) {
+                String infoMain = String.format("  %d. %-10s PV: %d", numeroCarte, c.getNom(), c.getVie());
+                this.m_graphics.putString(2, ligneTexteMain, infoMain);
+                ligneTexteMain++;
+                numeroCarte++;
+            }
+        } else {
+            this.m_graphics.putString(2, ligneTexteMain, "Rien a afficher");
         }
 
         this.rafraichir();
@@ -89,50 +104,92 @@ public class AffichageConsole {
 
         int col = getColDep(coor);
 
-        // 1. Haut de la carte
-        m_graphics.setCharacter(col, ligneDep, '*');
-        m_graphics.setCharacter(col + m_SIZE_CARTE, ligneDep, '*');
+        m_graphics.putString(col, ligneDep, "╭");
         for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
-            m_graphics.setCharacter(i, ligneDep, '-');
+            m_graphics.putString(i, ligneDep, "─");
         }
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDep, "╮");
 
-        // 2. Nom de la carte
-        m_graphics.setCharacter(col, ligneDep + 1, '|');
-        // On tronque ou formate le nom pour qu'il ne dépasse pas de la carte
-        String nomFormate = String.format(" %-11s", c.getNom());
-        m_graphics.putString(col + 1, ligneDep + 1, nomFormate);
-        m_graphics.setCharacter(col + m_SIZE_CARTE, ligneDep + 1, '|');
+        String nomFormate = String.format(" %-" + (m_SIZE_CARTE - 2) + "s", c.getNom());
+        m_graphics.putString(col,               ligneDep + 1, "│");
+        m_graphics.putString(col + 1,           ligneDep + 1, nomFormate);
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 1, "│");
 
-        // 3. Milieu de la carte (Ligne de séparation interne)
-        m_graphics.setCharacter(col, ligneDep + 2, '|');
-        m_graphics.setCharacter(col + m_SIZE_CARTE, ligneDep + 2, '|');
+        m_graphics.putString(col, ligneDep + 2, "├");
         for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
-            m_graphics.setCharacter(i, ligneDep + 2, '-');
+            m_graphics.putString(i, ligneDep + 2, "─");
         }
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 2, "┤");
 
-        // 4. Points de Vie (PV)
-        m_graphics.setCharacter(col, ligneDep + 3, '|');
-        String pvFormate = String.format(" PV: %-7d", c.getVie());
-        m_graphics.putString(col + 1, ligneDep + 3, pvFormate);
-        m_graphics.setCharacter(col + m_SIZE_CARTE, ligneDep + 3, '|');
+        String pvFormate = String.format(" PV: %-" + (m_SIZE_CARTE - 6) + "d", c.getVie());
+        m_graphics.putString(col,                ligneDep + 3, "│");
+        m_graphics.putString(col + 1,            ligneDep + 3, pvFormate);
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 3, "│");
 
-        m_graphics.setCharacter(col, ligneDep + 4, '|');
-        if(c instanceof Animal ani){
-            String attFormate = String.format(" Att: %-6d", ani.getAttack());
+        m_graphics.putString(col, ligneDep + 4, "│");
+        if (c instanceof Animal ani) {
+            String attFormate = String.format(" Att: %-" + (m_SIZE_CARTE - 7) + "d", ani.getAttack());
             m_graphics.putString(col + 1, ligneDep + 4, attFormate);
-        }else{
-            m_graphics.putString(col + 1, ligneDep + 4, "           ");
+        } else {
+            m_graphics.putString(col + 1, ligneDep + 4, " ".repeat(m_SIZE_CARTE - 1));
         }
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 4, "│");
 
-        m_graphics.setCharacter(col + m_SIZE_CARTE, ligneDep + 4, '|');
+        m_graphics.putString(col, ligneDep + 5, "│");
+        if (c instanceof Animal ani && ani.getVolant()) {
+            String volantFormate = String.format(" %-" + (m_SIZE_CARTE - 2) + "s", "* Volant");
+            m_graphics.putString(col + 1, ligneDep + 5, volantFormate);
+        } else {
+            m_graphics.putString(col + 1, ligneDep + 5, " ".repeat(m_SIZE_CARTE - 1));
+        }
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 5, "│");
 
-        m_graphics.setCharacter(col, ligneDep + 5, '*');
-        m_graphics.setCharacter(col + m_SIZE_CARTE, ligneDep + 5, '*');
+        m_graphics.putString(col, ligneDep + 6, "╰");
         for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
-            m_graphics.setCharacter(i, ligneDep + 5, '-');
+            m_graphics.putString(i, ligneDep + 6, "─");
         }
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 6, "╯");
 
         return true;
+    }
+
+    private void dessinerCaseVide(String label, int ligneDebut, int coordonnee) {
+        if (m_graphics == null) return;
+
+        int col = getColDep(coordonnee);
+
+        m_graphics.putString(col, ligneDebut, "╭");
+        for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
+            m_graphics.putString(i, ligneDebut, "─");
+        }
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDebut, "╮");
+
+        // Lignes intérieures
+        for (int ligne = 1; ligne < m_HAUTEUR_CARTE - 1; ligne++) {
+            m_graphics.putString(col,ligneDebut + ligne, "│");
+            m_graphics.putString(col + m_SIZE_CARTE, ligneDebut + ligne, "│");
+
+            if (ligne == m_HAUTEUR_CARTE / 2) {
+                // Label centré sur la ligne du milieu
+                int espaceInterieur = m_SIZE_CARTE - 1;
+                int padding = (espaceInterieur - label.length()) / 2;
+                String labelCentre = " ".repeat(padding) + label + " ".repeat(padding);
+                // Ajustement si longueur impaire
+                if (labelCentre.length() < espaceInterieur) {
+                    labelCentre += " ";
+                }
+                m_graphics.putString(col + 1, ligneDebut + ligne, labelCentre);
+            } else {
+                // Intérieur vide
+                m_graphics.putString(col + 1, ligneDebut + ligne, " ".repeat(m_SIZE_CARTE - 1));
+            }
+        }
+
+        m_graphics.putString(col, ligneDebut + m_HAUTEUR_CARTE - 1, "╰");
+        for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
+            m_graphics.putString(i, ligneDebut + m_HAUTEUR_CARTE - 1, "─");
+        }
+        m_graphics.putString(col + m_SIZE_CARTE, ligneDebut + m_HAUTEUR_CARTE - 1, "╯");
     }
 
     public void rafraichir() {
@@ -151,4 +208,12 @@ public class AffichageConsole {
             m_screen.clear();
         }
     }
+<<<<<<< HEAD
 }
+=======
+
+    public void finScreen(){
+        return;
+    }
+}
+>>>>>>> 9f1d570cc03df1c8db49f2b63f6abce095a9890b

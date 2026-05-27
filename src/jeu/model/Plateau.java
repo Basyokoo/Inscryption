@@ -7,6 +7,7 @@ public class Plateau {
     private ArrayList<Carte> m_ligneJ;
     private ArrayList<Carte> m_ligneE;
     private ArrayList<Carte> m_ligneEPT; // Ligne des intentions (Ennemi Prochain Tour)
+    private ArrayList<Pouvoir> m_pouvoir;
     private int m_nbObsE = 0;
     private int m_nbobsJ = 0;
 
@@ -14,6 +15,7 @@ public class Plateau {
         m_ligneJ = new ArrayList<Carte>();
         m_ligneE = new ArrayList<Carte>();
         m_ligneEPT = new ArrayList<Carte>();
+        m_pouvoir = new ArrayList<Pouvoir>();
         for (int i = 0; i < 4; i++) {
             m_ligneJ.add(null);
             m_ligneE.add(null);
