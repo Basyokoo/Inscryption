@@ -54,7 +54,7 @@ public class Combat {
             if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
                 return puissance;
             }
-            cible.modifierVie(cible.getVie() - puissance);
+            cible.modifierVie(puissance);
         }
         return puissance;
     }
