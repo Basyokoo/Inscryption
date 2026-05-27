@@ -97,4 +97,6 @@ public class Plateau {
     public ArrayList<Carte> getCartesIntentions() { return m_ligneEPT; }
     public ArrayList<Carte> getCartesLigneHaut() { return m_ligneE; }
     public ArrayList<Carte> getCartesLigneBas() { return m_ligneJ; }
+
+    //public
 }

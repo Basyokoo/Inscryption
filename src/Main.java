@@ -1,4 +1,5 @@
 import jeu.logic.GestionPartie;
+import jeu.model.Animal;
 
 public class Main {
   public static void main(String[] args) {

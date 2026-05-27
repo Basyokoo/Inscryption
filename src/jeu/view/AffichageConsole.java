@@ -1,13 +1,14 @@
 package jeu.view;
 
-import jeu.model.*;
-
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import jeu.model.Animal;
+import jeu.model.Carte;
+import jeu.model.MainJoueur;
+import jeu.model.Plateau;
 
 import java.io.IOException;
 
@@ -46,8 +47,8 @@ public class AffichageConsole {
         this.effacer();
 
         int ligneIntentions = 1;
-        int ligneAdverse    = ligneIntentions + m_HAUTEUR_CARTE + 1;  // = 9
-        int ligneJoueur     = ligneAdverse    + m_HAUTEUR_CARTE + 1;  // = 17
+        int ligneAdverse = ligneIntentions + m_HAUTEUR_CARTE + 1;  // = 9
+        int ligneJoueur = ligneAdverse + m_HAUTEUR_CARTE + 1;  // = 17
 
         // Ligne intentions adversaire (A1-A4)
         for (int i = 0; i < 4; i++) {
@@ -80,13 +81,14 @@ public class AffichageConsole {
         }
 
         int ligneScore = ligneJoueur + m_HAUTEUR_CARTE + 1;  // = 25
-        this.m_graphics.putString(2, ligneScore,     "Score balance : " + score);
+        this.m_graphics.putString(2, ligneScore, "Score balance : " + score);
         this.m_graphics.putString(2, ligneScore + 2, "Votre main :");
 
         int ligneTexteMain = ligneScore + 3;
         int numeroCarte = 1;
-        if (main.getCartesEnMain() != null) {
-            for (Carte c : main.getCartesEnMain()) {
+        if ((main.getCartesEnMain() != null)) {
+            for (int i = 0; i < main.getCartesEnMain().size(); i++) {
+                Carte c = main.getCartesEnMain().get(i);
                 String infoMain = String.format("  %d. %-10s PV: %d", numeroCarte, c.getNom(), c.getVie());
                 this.m_graphics.putString(2, ligneTexteMain, infoMain);
                 ligneTexteMain++;
@@ -111,8 +113,8 @@ public class AffichageConsole {
         m_graphics.putString(col + m_SIZE_CARTE, ligneDep, "╮");
 
         String nomFormate = String.format(" %-" + (m_SIZE_CARTE - 2) + "s", c.getNom());
-        m_graphics.putString(col,               ligneDep + 1, "│");
-        m_graphics.putString(col + 1,           ligneDep + 1, nomFormate);
+        m_graphics.putString(col, ligneDep + 1, "│");
+        m_graphics.putString(col + 1, ligneDep + 1, nomFormate);
         m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 1, "│");
 
         m_graphics.putString(col, ligneDep + 2, "├");
@@ -122,8 +124,8 @@ public class AffichageConsole {
         m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 2, "┤");
 
         String pvFormate = String.format(" PV: %-" + (m_SIZE_CARTE - 6) + "d", c.getVie());
-        m_graphics.putString(col,                ligneDep + 3, "│");
-        m_graphics.putString(col + 1,            ligneDep + 3, pvFormate);
+        m_graphics.putString(col, ligneDep + 3, "│");
+        m_graphics.putString(col + 1, ligneDep + 3, pvFormate);
         m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 3, "│");
 
         m_graphics.putString(col, ligneDep + 4, "│");
@@ -166,7 +168,7 @@ public class AffichageConsole {
 
         // Lignes intérieures
         for (int ligne = 1; ligne < m_HAUTEUR_CARTE - 1; ligne++) {
-            m_graphics.putString(col,ligneDebut + ligne, "│");
+            m_graphics.putString(col, ligneDebut + ligne, "│");
             m_graphics.putString(col + m_SIZE_CARTE, ligneDebut + ligne, "│");
 
             if (ligne == m_HAUTEUR_CARTE / 2) {
@@ -208,12 +210,4 @@ public class AffichageConsole {
             m_screen.clear();
         }
     }
-<<<<<<< HEAD
 }
-=======
-
-    public void finScreen(){
-        return;
-    }
-}
->>>>>>> 9f1d570cc03df1c8db49f2b63f6abce095a9890b

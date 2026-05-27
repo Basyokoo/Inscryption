@@ -13,6 +13,7 @@ public class GestionPartie {
     private MainJoueur m_main;
     private Adversaire m_adv;
     private AffichageConsole m_affichage;
+    private String m_action = "";
 
     public GestionPartie(){
         this.m_numPartie = 0;
@@ -43,16 +44,32 @@ public class GestionPartie {
     public boolean debutTour() {
         this.m_numTour++;
 
-        this.m_adv.planifierProchainTour(this.m_numTour);
-        this.m_adv.envoyerIntentionsAuPlateau(this.m_plat);
-
+        this.m_pioche.genererPioche();
+        this.m_main.creeMain();
         this.m_affichage.dessinerJeuComplet(this.m_plat, this.m_main, this.m_victoire);
+        this.m_adv.planifierProchainTour(this.m_numTour);
 
+
+        boucleTour();
         return true;
     }
 
 
     public boolean boucleTour(){
+        this.m_adv.envoyerIntentionsAuPlateau(this.m_plat);
+        this.m_adv.planifierProchainTour(this.m_numTour);
+
+        this.m_action = this.m_j.choisirAction();
+        System.out.println(this.m_action);
+        if (this.m_action == "1"){
+            Carte c = this.m_pioche.piocher();
+        }
+
+        if(verifFinPartie()){
+            finPartie();
+        }else{
+            boucleTour();
+        }
         return true;
     }
 

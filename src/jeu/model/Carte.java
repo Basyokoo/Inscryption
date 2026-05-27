@@ -5,7 +5,6 @@ public abstract class Carte {
     private int m_pointsVies = 0;
     private String m_type;
     private int m_Attack = 0;
-    private Pouvoir m_pouvoir;
 
     public Carte(String m, int num, String type){
         this.m_nom = m;
@@ -41,6 +40,9 @@ public abstract class Carte {
             return "Points de vie modifiés de : +" + changement + ".";
         }
     }
+
+
+    public abstract String setPouvoir(Pouvoir p);
 
 
     public boolean estVie(){

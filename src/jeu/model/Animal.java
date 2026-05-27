@@ -5,6 +5,8 @@ public class Animal extends Carte{
     protected int m_coutSang;
     protected int m_coutOs;
     protected boolean m_volatile;
+    private Pouvoir m_pouvoir = null;
+
 
     public Animal(Animal ani){
         super(ani.getNom(), ani.getVie(), "ANI");
@@ -12,6 +14,7 @@ public class Animal extends Carte{
         this.m_coutOs = ani.getCoutOs();
         this.m_coutSang = ani.getCoutSang();
         this.m_volatile = ani.getVolant();
+        this.m_pouvoir = ani.getPouvoir();
     }
     public Animal(String nom, int pV, int pointsAttaque, int sang, int os, boolean volant) {
         super(nom,pV,"ANI");
@@ -19,6 +22,15 @@ public class Animal extends Carte{
         this.m_coutSang = sang;
         this.m_coutOs = os;
         this.m_volatile = volant;
+    }
+
+    public Animal(String nom, int pV, int pointsAttaque, int sang, int os, boolean volant, Pouvoir p) {
+        super(nom,pV,"ANI");
+        this.m_pointsAttaque = pointsAttaque;
+        this.m_coutSang = sang;
+        this.m_coutOs = os;
+        this.m_volatile = volant;
+        this.m_pouvoir = p;
     }
 
     public int getAttack(){
@@ -32,5 +44,22 @@ public class Animal extends Carte{
     }
     public boolean getVolant(){
         return this.m_volatile;
+    }
+
+    public String setPouvoir(Pouvoir p){
+        if (this.m_pouvoir == null) {
+            this.m_pouvoir = p;
+            return "Le pouvoir a été ajouter avec succés";
+        }
+        return "erreur lors de l'appel de la fonction setPouvoir";
+
+    }
+
+    public Pouvoir getPouvoir(){
+        if (this.m_pouvoir == null){
+            return null;
+        }else{
+            return this.m_pouvoir;
+        }
     }
 }
