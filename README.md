@@ -160,7 +160,7 @@ Porc-épic | 1 | 2| 1 | 0 | Non | Piques pointues
 
 
 ### Pierre de sacrifice
-A la fin du tour 2, après avoir choisi une nouvelle carte. Le joueur doit sacrifier une carte, il récupère alors son pouvoir (si la carte en possède) et peut l'ajouter à une autre carte animal.
+A la fin de la deuxième partie, après avoir choisi une nouvelle carte. Le joueur doit sacrifier une carte, il récupère alors son pouvoir (si la carte en possède) et peut l'ajouter à une autre carte animal.
 
 
 
