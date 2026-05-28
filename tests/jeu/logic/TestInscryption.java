@@ -127,14 +127,13 @@ class CombatTest {
         pioche.add(loup);
         assertEquals(2, pioche.size(), "La pioche devrait contenir 2 cartes au début.");
         Animal cartePiochee = pioche.remove(0);
-        mainJoueur.ajouterMain(cartePiochee);
+        mainJoueur.ajouterMain(cartePiochee, 3);
         assertEquals(1, pioche.size(), "La pioche devrait contenir 1 carte après la pioche.");
         assertNotNull(mainJoueur.getCartesEnMain(), "La main ne devrait plus être considérée comme nulle.");
         ArrayList<Animal> cartesDansLaMain = mainJoueur.getCartesEnMain();
-        assertSame(ours, cartesDansLaMain.get(4), "L'animal pioché doit être l'Ours.");
+        assertSame(ours, cartesDansLaMain.get(3), "L'animal pioché doit être l'Ours.");
         assertSame(loup, pioche.get(0), "Le Loup doit rester dans la pioche.");
     }
-
     @Test
     void testMiseEnPlacePartieInitialisation() {
         Plateau plateau = new Plateau();

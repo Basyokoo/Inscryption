@@ -21,6 +21,7 @@ package jeu {
             - m_main : MainJoueur
             - m_adv : Adversaire
             - m_affichage : AffichageConsole
+            - m_action : String
             + <<create>> GestionPartie()
             + lancerJeu() : Boolean
             + debutTour() : Boolean
@@ -57,7 +58,7 @@ package jeu {
             + getNom() : String
             + getVie() : Integer
             + modifierVie(changement : Integer)
-            + estVivant() : Boolean
+            + estVie() : Boolean
             + toString() : String
         }
 
@@ -66,27 +67,34 @@ package jeu {
             - m_coutSang : Integer
             - m_coutOs : Integer
             - m_volant : Boolean
+            - m_pouvoir = null : Pouvoir
+            + <<create>> Animal(ani : Animal)
             + <<create>> Animal(nom : String, pv : Integer, att : Integer, sang : Integer, os : Integer, volant : Boolean)
+            + <<create>> Animal(nom : String, pv : Integer, att : Integer, sang : Integer, os : Integer, volant : Boolean, p : Pouvoir)
             + getAttack() : Integer
             + getCoutSang() : Integer
             + getCoutOs() : Integer
             + getVolant() : Boolean
+            + setPouvoir(p : Pouvoir) : String
+            + getPouvoir() : Pouvoir
         }
 
         class Obstacle extends Carte {
             + <<create>> Obstacle(nom : String, pv : Integer)
+            + setPouvoir(p : Pouvoir) : String
         }
 
         class Plateau {
             - m_ligneJ : ArrayList<Carte>
             - m_ligneE :  ArrayList<Carte>
             - m_ligneEPT : ArrayList<Carte>
+            - m_pouvoir : ArrayList<Pouvoir>
             - m_nbObsE = 0 : Integer
             - m_nbobsJ = 0 : Integer
             + <<create>> Plateau()
             + placerCarteJoueur(c : Carte, pos: Integer) : Boolean
             + placerCarteEnnemi(c : Carte, pos : Integer) : Boolean
-            + setCarteintention(c : Carte, pos : Integer) : Boolean
+            + setCarteIntention(c : Carte, pos : Integer) : Boolean
             + avancerLigne() : Boolean
             + placerObst() : Boolean
             + getCarteJoueur(place : Integer) : Carte
@@ -103,6 +111,7 @@ package jeu {
             + piocher() : Animal
             + ajouterCarte(carte : Animal)
             + getNombreCartes() : Integer
+            + genererPioche() : String
         }
 
         class MainJoueur {
@@ -114,6 +123,7 @@ package jeu {
             + ajouterOs(quantite : Integer)
             + consommerOs(quantite : Integer)
             + getNbOsDisponibles() : Integer
+            + creeMain() : String
         }
 
         class Joueur {
@@ -126,12 +136,14 @@ package jeu {
             + getActionsPlani() : Carte[*]
             + planifierProchainTour(numTour : Integer)
             + envoyerIntentionsAuPlateau(plateau : Plateau)
-            + executerTour(plateau : Plateau)
+            + executerProchainTour(plateau : Plateau)
         }
 
         class Pouvoir{
             - m_type : String
-            -m_activeDans = 0 : Integer
+            - m_nom : String
+            - m_activeDans = 0 : Integer
+            + <<create>> Pouvoir(nom : String, type : String, active : Integer)
         }
     }
 
