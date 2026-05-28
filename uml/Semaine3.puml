@@ -128,8 +128,10 @@ package jeu {
         }
 
         class Joueur {
+            - m_scanner : Scanner
             + <<create>> Joueur()
             + choisirAction() : String
+            + choisirPosition() : Integer
         }
 
         class Adversaire {
