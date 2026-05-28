@@ -124,6 +124,7 @@ package jeu {
             + consommerOs(quantite : Integer)
             + getNbOsDisponibles() : Integer
             + creeMain() : String
+            + aPlace() : Boolean
         }
 
         class Joueur {

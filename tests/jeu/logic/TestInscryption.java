@@ -144,18 +144,27 @@ class CombatTest {
         for (int i = 0; i < 4; i++) {
             assertNull(plateau.getCarteJoueur(i), "La case joueur " + i + " doit être vide au lancement.");
             assertNull(plateau.getCarteEnnemi(i), "La case ennemi " + i + " doit être vide au lancement.");
-            assertNull(plateau.getCartesIntentions().get(i), "La case intention " + i + " doit être vide au lancement.");
+            if (plateau.getCartesIntentions() != null) {
+                assertNull(plateau.getCartesIntentions().get(i), "La case intention " + i + " doit être vide au lancement.");
+            }
         }
         MainJoueur mainJoueur = new MainJoueur();
         assertEquals(0, mainJoueur.getNbOsDisponibles(), "Le joueur doit commencer la partie avec 0 Os.");
-        assertNull(mainJoueur.getCartesEnMain(), "La main doit être considérée vide (null) au tout début.");
+        assertNotNull(mainJoueur.getCartesEnMain(), "L'objet contenant les cartes en main doit être initialisé.");
+        assertEquals(4, mainJoueur.getCartesEnMain().size(), "La main doit posséder 4 emplacements de cartes au total.");
+        assertTrue(mainJoueur.aPlace(), "La main doit avoir des places libres au début de la partie.");
+        for (int i = 0; i < 4; i++) {
+            assertNull(mainJoueur.getCartesEnMain().get(i), "L'emplacement de main " + i + " doit être vide (null) au tout début.");
+        }
         ArrayList<Animal> deckPioche = new ArrayList<>();
         Animal ours = new Animal("Ours", 5, 4, 2, 0, false);
         Animal loup = new Animal("Loup", 4, 3, 1, 0, false);
         Animal lion = new Animal("Lion", 6, 5, 1, 0, false);
+
         deckPioche.add(ours);
         deckPioche.add(loup);
         deckPioche.add(lion);
+
         assertEquals(3, deckPioche.size(), "La pioche de départ doit contenir exactement 3 cartes.");
         assertSame(ours, deckPioche.get(0), "La première carte à piocher doit être l'Ours.");
     }

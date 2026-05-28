@@ -36,11 +36,9 @@ public class MainJoueur {
         }
     }
     public ArrayList<Animal> getCartesEnMain() {
-        if (this.isNull) {
-            return null;
-        };
         return m_cartesEnMain;
     }
+
     public int getNbOsDisponibles() {
         return m_nbOsDisponibles;
     }
@@ -103,5 +101,9 @@ public class MainJoueur {
 
             return "Pioche générer avec succés !";
 
+    }
+
+    public boolean aPlace() {
+        return this.m_cartesEnMain.contains(null);
     }
 }
