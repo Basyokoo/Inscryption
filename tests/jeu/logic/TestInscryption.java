@@ -2,7 +2,7 @@ package jeu.logic;
 import jeu.model.Animal;
 import jeu.model.Obstacle;
 import jeu.model.Plateau;
-import jeu.model.MainJoueur;
+
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;

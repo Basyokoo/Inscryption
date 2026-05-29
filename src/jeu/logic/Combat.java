@@ -4,24 +4,31 @@ import jeu.model.*;
 
 public class Combat {
 
-    // Note : Ajout du Score en paramètre pour pouvoir le modifier
     public String gererAttaqueFinTour(Plateau plateau, Score score) {
-        StringBuilder resumeCombat = new StringBuilder("--- Phase de Combat ---\n");
-        int totalDegatsJoueur = 0;
-        int totalDegatsEnnemi = 0;
+        StringBuilder sb = new StringBuilder("--- Phase de Combat ---\n");
 
+        // Traitement des cartes JOUEUR
         for (int i = 0; i < 4; i++) {
-            // Attaque du joueur
-            int degatsJ = executerAttaque(plateau.getCartesLigneBas().get(i),
-                    plateau.getCartesLigneHaut().get(i), i, false, resumeCombat, score);
-            totalDegatsJoueur += degatsJ;
-
-            // Attaque de l'ennemi
-            int degatsE = executerAttaque(plateau.getCartesLigneHaut().get(i),
-                    plateau.getCartesLigneBas().get(i), i, true, resumeCombat, score);
-            totalDegatsEnnemi += degatsE;
+            Carte c = plateau.getCarteJoueur(i);
+            if (c != null && c instanceof Animal) {
+                Animal a = (Animal) c;
+                sb.append("Le ").append(a.getNom()).append(" attaque pour ").append(a.getAttack()).append(" pts.\n");
+                score.ajouterPointsJoueur(a.getAttack());
+            }
         }
-        return resumeCombat.toString();
+
+        // Traitement des cartes ENNEMI (avec vérification du type !)
+        for (int i = 0; i < 4; i++) {
+            Carte c = plateau.getCarteEnnemi(i);
+            if (c != null) {
+                if (c instanceof Animal) {
+                    sb.append("L'ennemi ").append(((Animal)c).getNom()).append(" attaque.\n");
+                } else if (c instanceof Obstacle) {
+                    sb.append("L'obstacle ").append(((Obstacle)c).getNom()).append(" est présent.\n");
+                }
+            }
+        }
+        return sb.toString();
     }
 
     private int executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume, Score score) {

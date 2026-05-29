@@ -11,7 +11,6 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import jeu.model.Animal;
 import jeu.model.Carte;
-import jeu.model.MainJoueur;
 import jeu.model.Plateau;
 
 import java.io.IOException;
