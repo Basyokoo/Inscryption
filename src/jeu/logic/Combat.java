@@ -7,6 +7,7 @@ public class Combat {
     public String gererAttaqueFinTour(Joueur joueur, Adversaire adversaire, Score score) {
         StringBuilder resumeCombat = new StringBuilder("--- Phase de Combat ---\n");
 
+        // Traitement des cartes JOUEUR
         for (int i = 0; i < 4; i++) {
             // Attaque du joueur vers la ligne de l'adversaire
             executerAttaque(joueur.getCartesLigneBas().get(i),

@@ -17,8 +17,6 @@ package jeu {
             - m_numTour : Integer
             - m_plat : Plateau
             - m_j : Joueur
-            - m_pioche : Pioche
-            - m_main : MainJoueur
             - m_adv : Adversaire
             - m_affichage : AffichageConsole
             - m_action : String
@@ -44,6 +42,24 @@ package jeu {
             - executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume) : Integer
             + appliquerDegats(attaquant : Animal, cible : Carte, position : Integer) : Integer
             + verifierMorts(plateau : Plateau, mainJoueur : MainJoueur, mainAdversaire : MainJoueur)
+        }
+
+         class Joueur {
+            - m_cartesEnMain : ArrayList<Animal>
+            - m_pioche : ArrayList<Animal>
+            - nbOsDisponibles : Integer
+            - isNull : boolean
+            + <<create>> Joueur()
+            + initialiserPiocheDeBase()
+            + choisirAction() : String
+            + choisirPosition() : Integer
+         }
+        class Adversaire {
+            - m_actionsPlanifiees : Carte[*]
+            + getActionsPlani() : Carte[*]
+            + planifierProchainTour(numTour : Integer)
+            + envoyerIntentionsAuPlateau(plateau : Plateau)
+            + executerProchainTour(plateau : Plateau)
         }
     }
 
@@ -103,45 +119,6 @@ package jeu {
             + getCartesLigneHaut() : ArrayList<Carte>
             + getCartesLignebas() : ArrayList<Carte>
         }
-
-        class Pioche {
-            - m_cartes : ArrayList<Carte>
-            + <<create>> Pioche()
-            + initialiserPiocheDeBase()
-            + piocher() : Animal
-            + ajouterCarte(carte : Animal)
-            + getNombreCartes() : Integer
-            + genererPioche() : String
-        }
-
-        class MainJoueur {
-            - m_cartesEnMain : ArrayList<Animal>
-            - m_nbOsDisponibles : Integer
-            + <<create>> MainJoueur()
-            + ajouterMain(carte : Animal)
-            + retirerMain(carte : Animal)
-            + ajouterOs(quantite : Integer)
-            + consommerOs(quantite : Integer)
-            + getNbOsDisponibles() : Integer
-            + creeMain() : String
-            + aPlace() : Boolean
-        }
-
-        class Joueur {
-            - m_scanner : Scanner
-            + <<create>> Joueur()
-            + choisirAction() : String
-            + choisirPosition() : Integer
-        }
-
-        class Adversaire {
-            - m_actionsPlanifiees : Carte[*]
-            + getActionsPlani() : Carte[*]
-            + planifierProchainTour(numTour : Integer)
-            + envoyerIntentionsAuPlateau(plateau : Plateau)
-            + executerProchainTour(plateau : Plateau)
-        }
-
         class Pouvoir{
             - m_type : String
             - m_nom : String
@@ -163,6 +140,7 @@ package jeu {
             + getColDep(coor : Integer)
             + dessinerJeuComplet(plateau : Plateau, main : MainJoueur, score : Integer)
             + dessineCarte(c : Carte, ligneDep : Integer, coor : Integer) : Boolean
+            + afficherChoix() : String
             + rafraichir()
             + effacer()
         }
@@ -171,10 +149,7 @@ package jeu {
 
 ' --- Relations et Dépendances ---
 Main .> GestionPartie : <<call>>
-
 GestionPartie *--> Plateau : m_plat <
-GestionPartie *--> Pioche : m_pioche <
-GestionPartie *--> MainJoueur : m_main <
 GestionPartie *--> Joueur : m_j <
 GestionPartie *--> Adversaire : m_adv <
 GestionPartie *--> Pouvoir : m_pouv <
