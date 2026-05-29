@@ -1,7 +1,10 @@
 package jeu.view;
 
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -13,24 +16,37 @@ import jeu.model.Plateau;
 import java.io.IOException;
 
 public class AffichageConsole {
-    static final int m_SIZE_CARTE = 13;
-    static final int m_SIZE_DECALAGE = 3;
-    static final int m_HAUTEUR_CARTE = 7;
-    static final int m_LARGEUR_ECRAN = m_SIZE_CARTE * 4 + m_SIZE_DECALAGE * 3 + 10;
-    static final int m_HAUTEUR_ECRAN = m_HAUTEUR_CARTE * 3 + 2 + 15;
+    static final int m_LARGEUR_CARTE = 16;
+    static final int m_HAUTEUR_CARTE = 11;  // Passé à 11 comme demandé
 
     private Screen m_screen;
     private TextGraphics m_graphics;
 
+    private int m_largeurEcran;
+    private int m_hauteurEcran;
+    private int m_decalageDynamique;
+    private int m_margeGauche;
+
     public boolean initEcran() {
         try {
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
-            factory.setInitialTerminalSize(new TerminalSize(m_LARGEUR_ECRAN, m_HAUTEUR_ECRAN));
+            factory.setTerminalEmulatorTitle("Mon Jeu de Cartes");
+            factory.setForceAWTOverSwing(false);
 
-            this.m_screen = new TerminalScreen(factory.createTerminal());
+            com.googlecode.lanterna.terminal.Terminal terminal = factory.createTerminal();
+
+            if (terminal instanceof java.awt.Window window) {
+                if (window instanceof java.awt.Frame frame) {
+                    frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
+                }
+            }
+
+            this.m_screen = new TerminalScreen(terminal);
             this.m_screen.startScreen();
             this.m_screen.setCursorPosition(null);
             this.m_graphics = m_screen.newTextGraphics();
+
+            mettreAJourDimensions();
 
             return true;
         } catch (IOException e) {
@@ -39,18 +55,39 @@ public class AffichageConsole {
         }
     }
 
+    private void mettreAJourDimensions() {
+        TerminalSize size = m_screen.getTerminalSize();
+        this.m_largeurEcran = size.getColumns();
+        this.m_hauteurEcran = size.getRows();
+
+        int largeurTotaleCartes = m_LARGEUR_CARTE * 4;
+        int espaceRestant = m_largeurEcran - largeurTotaleCartes;
+
+        if (espaceRestant > 0) {
+            int portion = espaceRestant / 5;
+            this.m_decalageDynamique = Math.max(3, portion);
+            this.m_margeGauche = portion;
+        } else {
+            this.m_decalageDynamique = 3;
+            this.m_margeGauche = 2;
+        }
+    }
+
     public int getColDep(int coor) {
-        return 5 + (m_SIZE_CARTE + m_SIZE_DECALAGE) * coor;
+        return m_margeGauche + (m_LARGEUR_CARTE + m_decalageDynamique) * coor;
     }
 
     public void dessinerJeuComplet(Plateau plateau, MainJoueur main, int score) {
+        m_screen.doResizeIfNecessary();
+        mettreAJourDimensions();
+
         this.effacer();
 
         int ligneIntentions = 1;
-        int ligneAdverse = ligneIntentions + m_HAUTEUR_CARTE + 1;  // = 9
-        int ligneJoueur = ligneAdverse + m_HAUTEUR_CARTE + 1;  // = 17
+        int ligneAdverse = ligneIntentions + m_HAUTEUR_CARTE + 1;
+        int ligneJoueur = ligneAdverse + m_HAUTEUR_CARTE + 1;
 
-        // Ligne intentions adversaire (A1-A4)
+        // Ligne intentions adversaire
         for (int i = 0; i < 4; i++) {
             Carte c = plateau.getCartesIntentions().get(i);
             if (c != null) {
@@ -60,7 +97,7 @@ public class AffichageConsole {
             }
         }
 
-        // Ligne adversaire (A1-A4)
+        // Ligne adversaire
         for (int i = 0; i < 4; i++) {
             Carte c = plateau.getCartesLigneHaut().get(i);
             if (c != null) {
@@ -70,7 +107,7 @@ public class AffichageConsole {
             }
         }
 
-        // Ligne joueur (B1-B4)
+        // Ligne joueur
         for (int i = 0; i < 4; i++) {
             Carte c = plateau.getCartesLigneBas().get(i);
             if (c != null) {
@@ -80,22 +117,22 @@ public class AffichageConsole {
             }
         }
 
-        int ligneScore = ligneJoueur + m_HAUTEUR_CARTE + 1;  // = 25
-        this.m_graphics.putString(2, ligneScore, "Score balance : " + score);
-        this.m_graphics.putString(2, ligneScore + 2, "Votre main :");
+        int ligneScore = ligneJoueur + m_HAUTEUR_CARTE + 1;
+        this.m_graphics.putString(m_margeGauche, ligneScore, "Score balance : " + score);
+        this.m_graphics.putString(m_margeGauche, ligneScore + 2, "Votre main :");
 
         int ligneTexteMain = ligneScore + 3;
         int numeroCarte = 1;
         if ((main.getCartesEnMain() != null)) {
             for (int i = 0; i < main.getCartesEnMain().size(); i++) {
                 Carte c = main.getCartesEnMain().get(i);
-                String infoMain = String.format("  %d. %-10s PV: %d", numeroCarte, c.getNom(), c.getVie());
-                this.m_graphics.putString(2, ligneTexteMain, infoMain);
+                String infoMain = String.format("  %d. %-12s PV: %d", numeroCarte, c.getNom(), c.getVie());
+                this.m_graphics.putString(m_margeGauche, ligneTexteMain, infoMain);
                 ligneTexteMain++;
                 numeroCarte++;
             }
         } else {
-            this.m_graphics.putString(2, ligneTexteMain, "Rien a afficher");
+            this.m_graphics.putString(m_margeGauche, ligneTexteMain, "Rien a afficher");
         }
 
         this.rafraichir();
@@ -105,52 +142,64 @@ public class AffichageConsole {
         if (m_graphics == null) return false;
 
         int col = getColDep(coor);
+        int coinDroit = col + m_LARGEUR_CARTE - 1;
 
+        // Bord haut (Ligne 0)
         m_graphics.putString(col, ligneDep, "╭");
-        for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
+        for (int i = col + 1; i < coinDroit; i++) {
             m_graphics.putString(i, ligneDep, "─");
         }
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDep, "╮");
+        m_graphics.putString(coinDroit, ligneDep, "╮");
 
-        String nomFormate = String.format(" %-" + (m_SIZE_CARTE - 2) + "s", c.getNom());
+        // Nom (Ligne 1)
+        String nomFormate = String.format(" %-" + (m_LARGEUR_CARTE - 2) + "s", c.getNom());
         m_graphics.putString(col, ligneDep + 1, "│");
         m_graphics.putString(col + 1, ligneDep + 1, nomFormate);
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 1, "│");
+        m_graphics.putString(coinDroit, ligneDep + 1, "│");
 
+        // Séparateur (Ligne 2)
         m_graphics.putString(col, ligneDep + 2, "├");
-        for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
+        for (int i = col + 1; i < coinDroit; i++) {
             m_graphics.putString(i, ligneDep + 2, "─");
         }
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 2, "┤");
+        m_graphics.putString(coinDroit, ligneDep + 2, "┤");
 
-        String pvFormate = String.format(" PV: %-" + (m_SIZE_CARTE - 6) + "d", c.getVie());
+        // PV (Ligne 3)
+        String pvFormate = String.format(" PV: %-" + (m_LARGEUR_CARTE - 6) + "d", c.getVie());
         m_graphics.putString(col, ligneDep + 3, "│");
         m_graphics.putString(col + 1, ligneDep + 3, pvFormate);
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 3, "│");
+        m_graphics.putString(coinDroit, ligneDep + 3, "│");
 
+        // Attaque (Ligne 4)
         m_graphics.putString(col, ligneDep + 4, "│");
         if (c instanceof Animal ani) {
-            String attFormate = String.format(" Att: %-" + (m_SIZE_CARTE - 7) + "d", ani.getAttack());
+            String attFormate = String.format(" Att: %-" + (m_LARGEUR_CARTE - 7) + "d", ani.getAttack());
             m_graphics.putString(col + 1, ligneDep + 4, attFormate);
         } else {
-            m_graphics.putString(col + 1, ligneDep + 4, " ".repeat(m_SIZE_CARTE - 1));
+            m_graphics.putString(col + 1, ligneDep + 4, " ".repeat(m_LARGEUR_CARTE - 2));
         }
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 4, "│");
+        m_graphics.putString(coinDroit, ligneDep + 4, "│");
 
+        // Capacité Volant (Ligne 5)
         m_graphics.putString(col, ligneDep + 5, "│");
         if (c instanceof Animal ani && ani.getVolant()) {
-            String volantFormate = String.format(" %-" + (m_SIZE_CARTE - 2) + "s", "* Volant");
+            String volantFormate = String.format(" * Volant%-" + (m_LARGEUR_CARTE - 11) + "s", "");
             m_graphics.putString(col + 1, ligneDep + 5, volantFormate);
         } else {
-            m_graphics.putString(col + 1, ligneDep + 5, " ".repeat(m_SIZE_CARTE - 1));
+            m_graphics.putString(col + 1, ligneDep + 5, " ".repeat(m_LARGEUR_CARTE - 2));
         }
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 5, "│");
+        m_graphics.putString(coinDroit, ligneDep + 5, "│");
 
-        m_graphics.putString(col, ligneDep + 6, "╰");
-        for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
-            m_graphics.putString(i, ligneDep + 6, "─");
+        for (int ligneVide = 6; ligneVide < m_HAUTEUR_CARTE - 1; ligneVide++) {
+            m_graphics.putString(col, ligneDep + ligneVide, "│" + " ".repeat(m_LARGEUR_CARTE - 2) + "│");
         }
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDep + 6, "╯");
+
+        // Bord bas (Ligne 10)
+        m_graphics.putString(col, ligneDep + m_HAUTEUR_CARTE - 1, "╰");
+        for (int i = col + 1; i < coinDroit; i++) {
+            m_graphics.putString(i, ligneDep + m_HAUTEUR_CARTE - 1, "─");
+        }
+        m_graphics.putString(coinDroit, ligneDep + m_HAUTEUR_CARTE - 1, "╯");
 
         return true;
     }
@@ -159,39 +208,84 @@ public class AffichageConsole {
         if (m_graphics == null) return;
 
         int col = getColDep(coordonnee);
+        int coinDroit = col + m_LARGEUR_CARTE - 1;
 
         m_graphics.putString(col, ligneDebut, "╭");
-        for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
+        for (int i = col + 1; i < coinDroit; i++) {
             m_graphics.putString(i, ligneDebut, "─");
         }
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDebut, "╮");
+        m_graphics.putString(coinDroit, ligneDebut, "╮");
 
-        // Lignes intérieures
         for (int ligne = 1; ligne < m_HAUTEUR_CARTE - 1; ligne++) {
             m_graphics.putString(col, ligneDebut + ligne, "│");
-            m_graphics.putString(col + m_SIZE_CARTE, ligneDebut + ligne, "│");
+            m_graphics.putString(coinDroit, ligneDebut + ligne, "│");
 
             if (ligne == m_HAUTEUR_CARTE / 2) {
-                // Label centré sur la ligne du milieu
-                int espaceInterieur = m_SIZE_CARTE - 1;
-                int padding = (espaceInterieur - label.length()) / 2;
+                int espaceInterieur = m_LARGEUR_CARTE - 2;
+                int padding = Math.max(0, (espaceInterieur - label.length()) / 2);
                 String labelCentre = " ".repeat(padding) + label + " ".repeat(padding);
-                // Ajustement si longueur impaire
-                if (labelCentre.length() < espaceInterieur) {
+                while (labelCentre.length() < espaceInterieur) {
                     labelCentre += " ";
                 }
                 m_graphics.putString(col + 1, ligneDebut + ligne, labelCentre);
             } else {
-                // Intérieur vide
-                m_graphics.putString(col + 1, ligneDebut + ligne, " ".repeat(m_SIZE_CARTE - 1));
+                m_graphics.putString(col + 1, ligneDebut + ligne, " ".repeat(m_LARGEUR_CARTE - 2));
             }
         }
 
         m_graphics.putString(col, ligneDebut + m_HAUTEUR_CARTE - 1, "╰");
-        for (int i = col + 1; i < col + m_SIZE_CARTE; i++) {
+        for (int i = col + 1; i < coinDroit; i++) {
             m_graphics.putString(i, ligneDebut + m_HAUTEUR_CARTE - 1, "─");
         }
-        m_graphics.putString(col + m_SIZE_CARTE, ligneDebut + m_HAUTEUR_CARTE - 1, "╯");
+        m_graphics.putString(coinDroit, ligneDebut + m_HAUTEUR_CARTE - 1, "╯");
+    }
+
+    public String afficherChoix() {
+        StringBuilder inputBuffer = new StringBuilder();
+
+        int ligneBoite = m_hauteurEcran - 4;
+        int largeurBoite = 50;
+        int colBoite = m_margeGauche;
+
+        while (true) {
+            m_graphics.putString(colBoite, ligneBoite, "╭" + "─".repeat(largeurBoite - 2) + "╮");
+
+            String texteAffiche = " Votre choix : " + inputBuffer.toString();
+            int paddingEspaces = (largeurBoite - 2) - texteAffiche.length();
+            if (paddingEspaces > 0) {
+                texteAffiche += " ".repeat(paddingEspaces);
+            } else {
+                texteAffiche = texteAffiche.substring(0, largeurBoite - 2);
+            }
+
+            m_graphics.putString(colBoite, ligneBoite + 1, "│" + texteAffiche + "│");
+            m_graphics.putString(colBoite, ligneBoite + 2, "╰" + "─".repeat(largeurBoite - 2) + "╯");
+
+            m_screen.setCursorPosition(new TerminalPosition(colBoite + 15 + inputBuffer.length(), ligneBoite + 1));
+            this.rafraichir();
+
+            try {
+                KeyStroke keyStroke = m_screen.readInput();
+
+                if (keyStroke.getKeyType() == KeyType.Enter) {
+                    m_screen.setCursorPosition(null);
+                    return inputBuffer.toString().trim();
+                }
+                else if (keyStroke.getKeyType() == KeyType.Backspace) {
+                    if (inputBuffer.length() > 0) {
+                        inputBuffer.deleteCharAt(inputBuffer.length() - 1);
+                    }
+                }
+                else if (keyStroke.getKeyType() == KeyType.Character) {
+                    if (inputBuffer.length() < (largeurBoite - 18)) {
+                        inputBuffer.append(keyStroke.getCharacter());
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
     }
 
     public void rafraichir() {
@@ -203,7 +297,6 @@ public class AffichageConsole {
             e.printStackTrace();
         }
     }
-
 
     public void effacer() {
         if (m_screen != null) {
