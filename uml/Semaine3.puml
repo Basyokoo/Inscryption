@@ -40,7 +40,7 @@ package jeu {
             + estVictoireEnnemi() : Boolean
                 }
         class Combat {
-            + gererAttaqueFinTour(plateau : Plateau) : String
+            + gererAttaquesFinTour(plateau : Plateau) : String
             - executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume) : Integer
             + appliquerDegats(attaquant : Animal, cible : Carte, position : Integer) : Integer
             + verifierMorts(plateau : Plateau, mainJoueur : MainJoueur, mainAdversaire : MainJoueur)

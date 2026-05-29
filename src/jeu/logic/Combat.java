@@ -1,77 +1,76 @@
 package jeu.logic;
 
-import jeu.model.Plateau;
-import jeu.model.Carte;
-import jeu.model.Animal;
-import jeu.model.MainJoueur;
-import java.util.ArrayList;
-import java.util.List;
+import jeu.model.*;
 
 public class Combat {
 
-    public String gererAttaquesFinTour(Plateau plateau) {
+    // Note : Ajout du Score en paramètre pour pouvoir le modifier
+    public String gererAttaqueFinTour(Plateau plateau, Score score) {
         StringBuilder resumeCombat = new StringBuilder("--- Phase de Combat ---\n");
         int totalDegatsJoueur = 0;
         int totalDegatsEnnemi = 0;
 
         for (int i = 0; i < 4; i++) {
-            int degatsJ = executerAttaque(plateau.getCarteJoueur(i), plateau.getCarteEnnemi(i), i, false, resumeCombat);
+            // Attaque du joueur
+            int degatsJ = executerAttaque(plateau.getCartesLigneBas().get(i),
+                    plateau.getCartesLigneHaut().get(i), i, false, resumeCombat, score);
             totalDegatsJoueur += degatsJ;
-            int degatsE = executerAttaque(plateau.getCarteEnnemi(i), plateau.getCarteJoueur(i), i, true, resumeCombat);
+
+            // Attaque de l'ennemi
+            int degatsE = executerAttaque(plateau.getCartesLigneHaut().get(i),
+                    plateau.getCartesLigneBas().get(i), i, true, resumeCombat, score);
             totalDegatsEnnemi += degatsE;
         }
-        resumeCombat.append(String.format("Fin du combat. Dégâts totaux du joueur : %d | Ennemi : %d",
-                totalDegatsJoueur, totalDegatsEnnemi));
         return resumeCombat.toString();
     }
 
-    private int executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume) {
+    private int executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume, Score score) {
         if (!(attaquant instanceof Animal) || !attaquant.estVie()) {
             return 0;
         }
         Animal animalAttaquant = (Animal) attaquant;
-        int degatsInfliges = appliquerDegats(animalAttaquant, cible, position);
-        if (degatsInfliges > 0) {
-            String prefixe = estEnnemi ? "L'ennemi " : "";
-            resume.append(prefixe)
-                    .append(animalAttaquant.getNom())
-                    .append(" inflige ")
-                    .append(degatsInfliges)
-                    .append(" dégâts en position ")
-                    .append(position).append(".\n");
-        }
-        return degatsInfliges;
-    }
-    public Integer appliquerDegats(Animal attaquant, Carte cible, Integer position) {
-        if (attaquant == null || attaquant.getAttack() <= 0) {
-            return 0;
-        }
-        if (position < 0 || position > 3) {
-            return 0;
-        }
-        int puissance = attaquant.getAttack();
-        if (cible != null && cible.estVie()) {
-            if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
-                return puissance;
+
+        // Logique de dégâts : Si pas de cible, on inflige des dégâts au score
+        if (cible == null || !cible.estVie()) {
+            int degats = animalAttaquant.getAttack();
+            if (!estEnnemi) {
+                score.ajouterPointsJoueur(degats);
+                resume.append(animalAttaquant.getNom()).append(" attaque le score adverse pour ").append(degats).append(" pts.\n");
+            } else {
+                score.ajouterPointsEnnemi(degats);
+                resume.append("L'ennemi ").append(animalAttaquant.getNom()).append(" attaque votre score pour ").append(degats).append(" pts.\n");
             }
-            cible.modifierVie(puissance);
+            return degats;
+        } else {
+            // Combat classique contre une carte
+            return appliquerDegats(animalAttaquant, cible, position);
         }
+    }
+
+    public Integer appliquerDegats(Animal attaquant, Carte cible, Integer position) {
+        int puissance = attaquant.getAttack();
+
+        // Règle du vol : attaque directement si l'adversaire n'est pas volant
+        if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
+            cible.modifierVie(puissance);
+            return puissance;
+        }
+
+        // Combat standard
+        cible.modifierVie(puissance);
         return puissance;
     }
-    public void verifierMorts(Plateau plateau, MainJoueur mainJoueur, MainJoueur mainAdversaire) {
-        for (int i = 0; i < 4; i++) {
-            Carte carteJoueur = plateau.getCarteJoueur(i);
-            if (carteJoueur != null && !carteJoueur.estVie()) {
-                mainJoueur.ajouterOs(1);
-                plateau.placerCarteJoueur(null, i);
-            }
-            Carte carteEnnemi = plateau.getCarteEnnemi(i);
-            if (carteEnnemi != null && !carteEnnemi.estVie()) {
-                if (mainAdversaire != null) {
-                    mainAdversaire.ajouterOs(1);
-                }
 
-                plateau.placerCarteEnnemi(null, i);
+    public void verifierMorts(Plateau plateau, MainJoueur mainJoueur, MainJoueur mainAdversaire) {
+        // Logique existante : vérification des points de vie <= 0
+        for (int i = 0; i < 4; i++) {
+            if (plateau.getCartesLigneBas().get(i) != null && !plateau.getCartesLigneBas().get(i).estVie()) {
+                mainJoueur.ajouterOs(1);
+                plateau.getCartesLigneBas().set(i, null);
+            }
+            if (plateau.getCartesLigneHaut().get(i) != null && !plateau.getCartesLigneHaut().get(i).estVie()) {
+                if (mainAdversaire != null) mainAdversaire.ajouterOs(1);
+                plateau.getCartesLigneHaut().set(i, null);
             }
         }
     }

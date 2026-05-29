@@ -13,11 +13,10 @@ public class GestionPartie {
     private MainJoueur m_main;
     private Adversaire m_adv;
     private AffichageConsole m_affichage;
-    private Pouvoir m_pouv;
     private String m_action = "";
     private Score m_score;
 
-    public GestionPartie(){
+    public GestionPartie() {
         this.m_numPartie = 0;
         this.m_victoire = 0;
         this.m_numTour = 0;
@@ -30,23 +29,18 @@ public class GestionPartie {
         this.m_score = new Score();
     }
 
-    public boolean lancerJeu(){
+    public boolean lancerJeu() {
         this.m_plat = new Plateau();
-        this.m_j = new Joueur();
-        this.m_adv = new Adversaire();
         this.m_main = new MainJoueur();
         this.m_pioche = new Pioche();
         this.m_score = new Score();
+        this.m_numTour = 0;
+
         this.m_pioche.initialiserPiocheDeBase();
         this.m_main.creeMain();
 
         this.m_affichage = new AffichageConsole();
-        if (!this.m_affichage.initEcran()) {
-            System.out.println("Erreur : Impossible d'initialiser l'écran.");
-            return false;
-        }
-
-        return true;
+        return this.m_affichage.initEcran();
     }
 
     public boolean debutTour() {
@@ -59,27 +53,27 @@ public class GestionPartie {
     }
 
     public boolean boucleTour() {
-        this.m_affichage.dessinerJeuComplet(this.m_plat, this.m_main, this.m_score.getValeurEcart());
-        this.m_affichage.rafraichir();
         this.m_action = this.m_j.choisirAction();
 
         switch (this.m_action) {
-            case "1":
+            case "1": // Piocher
                 if (this.m_main.aPlace() && this.m_pioche.getNombreCartes() > 0) {
-                    Animal cartePiochee = this.m_pioche.piocher();
-                    int indexLibre = this.m_main.getCartesEnMain().indexOf(null);
-                    this.m_main.ajouterMain(cartePiochee, indexLibre);
-                }
-                return true;
+                    Animal cartePiochee = (Animal) this.m_pioche.piocher(); // Cast en Animal si nécessaire
 
-            case "2":
-                this.propCarte();
+                    // Trouver l'index du premier emplacement vide (null)
+                    int indexLibre = this.m_main.getCartesEnMain().indexOf(null);
+
+                    // Appeler la méthode avec les deux paramètres requis
+                    if (indexLibre != -1) {
+                        this.m_main.ajouterMain(cartePiochee, indexLibre);
+                    }
+                }
                 return true;
 
             case "3":
                 System.out.println("Fin de votre phase d'action. Lancement des combats !");
                 Combat combat = new Combat();
-                combat.gererAttaquesFinTour(this.m_plat);
+                combat.gererAttaqueFinTour(this.m_plat, this.m_score);
                 combat.verifierMorts(this.m_plat, this.m_main, null);
                 return false;
 
@@ -88,26 +82,27 @@ public class GestionPartie {
         }
     }
 
-    public boolean verifFinPartie(){
-        if (this.m_score.estVictoireJoueur() || this.m_score.estVictoireEnnemi()){
-            return true;
-        }
-        return false;
+    public boolean verifFinPartie() {
+        return Math.abs(this.m_score.getValeurEcart()) >= 5;
     }
 
-    public boolean finPartie(){
+    public boolean finPartie() {
         this.m_affichage.effacer();
         if (this.m_score.estVictoireJoueur()) {
-            System.out.println("Félicitations, vous avez gagné la partie !");
+            System.out.println("Partie gagnée !");
             this.m_victoire++;
         } else {
-            System.out.println("Défaite... L'adversaire a remporté la partie.");
+            System.out.println("Partie perdue.");
         }
-        this.m_affichage.rafraichir();
+        this.m_numPartie++;
         return true;
     }
 
-    public boolean propCarte(){
-        return true;
+    public void gererPierreSacrifice() {
+        // Appelé après la 2ème partie
+        System.out.println("Phase Pierre de Sacrifice : Choisissez une carte à sacrifier pour récupérer son pouvoir.");
+        // Implémentation de la logique de transfert de pouvoir
     }
+
+    public int getNumPartie() { return m_numPartie; }
 }
