@@ -4,22 +4,17 @@ import jeu.model.*;
 
 public class Combat {
 
-    // Note : Ajout du Score en paramètre pour pouvoir le modifier
-    public String gererAttaqueFinTour(Plateau plateau, Score score) {
+    public String gererAttaqueFinTour(Joueur joueur, Adversaire adversaire, Score score) {
         StringBuilder resumeCombat = new StringBuilder("--- Phase de Combat ---\n");
-        int totalDegatsJoueur = 0;
-        int totalDegatsEnnemi = 0;
 
         for (int i = 0; i < 4; i++) {
-            // Attaque du joueur
-            int degatsJ = executerAttaque(plateau.getCartesLigneBas().get(i),
-                    plateau.getCartesLigneHaut().get(i), i, false, resumeCombat, score);
-            totalDegatsJoueur += degatsJ;
+            // Attaque du joueur vers la ligne de l'adversaire
+            executerAttaque(joueur.getCartesLigneBas().get(i),
+                    adversaire.getCartesLigneHaut().get(i), i, false, resumeCombat, score);
 
-            // Attaque de l'ennemi
-            int degatsE = executerAttaque(plateau.getCartesLigneHaut().get(i),
-                    plateau.getCartesLigneBas().get(i), i, true, resumeCombat, score);
-            totalDegatsEnnemi += degatsE;
+            // Attaque de l'ennemi vers la ligne du joueur
+            executerAttaque(adversaire.getCartesLigneHaut().get(i),
+                    joueur.getCartesLigneBas().get(i), i, true, resumeCombat, score);
         }
         return resumeCombat.toString();
     }
@@ -30,7 +25,6 @@ public class Combat {
         }
         Animal animalAttaquant = (Animal) attaquant;
 
-        // Logique de dégâts : Si pas de cible, on inflige des dégâts au score
         if (cible == null || !cible.estVie()) {
             int degats = animalAttaquant.getAttack();
             if (!estEnnemi) {
@@ -42,7 +36,6 @@ public class Combat {
             }
             return degats;
         } else {
-            // Combat classique contre une carte
             return appliquerDegats(animalAttaquant, cible, position);
         }
     }
@@ -50,28 +43,12 @@ public class Combat {
     public Integer appliquerDegats(Animal attaquant, Carte cible, Integer position) {
         int puissance = attaquant.getAttack();
 
-        // Règle du vol : attaque directement si l'adversaire n'est pas volant
         if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
             cible.modifierVie(puissance);
             return puissance;
         }
 
-        // Combat standard
         cible.modifierVie(puissance);
         return puissance;
-    }
-
-    public void verifierMorts(Plateau plateau, MainJoueur mainJoueur, MainJoueur mainAdversaire) {
-        // Logique existante : vérification des points de vie <= 0
-        for (int i = 0; i < 4; i++) {
-            if (plateau.getCartesLigneBas().get(i) != null && !plateau.getCartesLigneBas().get(i).estVie()) {
-                mainJoueur.ajouterOs(1);
-                plateau.getCartesLigneBas().set(i, null);
-            }
-            if (plateau.getCartesLigneHaut().get(i) != null && !plateau.getCartesLigneHaut().get(i).estVie()) {
-                if (mainAdversaire != null) mainAdversaire.ajouterOs(1);
-                plateau.getCartesLigneHaut().set(i, null);
-            }
-        }
     }
 }

@@ -11,10 +11,9 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import jeu.model.Animal;
 import jeu.model.Carte;
-import jeu.model.MainJoueur;
-import jeu.model.Plateau;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class AffichageConsole {
     static final int m_LARGEUR_CARTE = 16;
@@ -39,10 +38,6 @@ public class AffichageConsole {
 
             if (terminal instanceof SwingTerminalFrame frame) {
                 frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
-            } else if (terminal instanceof java.awt.Window window) {
-                if (window instanceof java.awt.Frame frame) {
-                    frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
-                }
             }
 
             this.m_screen = new TerminalScreen(terminal);
@@ -82,83 +77,82 @@ public class AffichageConsole {
         return m_margeGauche + (m_LARGEUR_CARTE + m_decalageDynamique) * coor;
     }
 
-    public void dessinerJeuComplet(Plateau plateau, MainJoueur main, int score) {
+    public void dessinerJeuSansPlateau(ArrayList<Carte> cartesTerrainJoueur, ArrayList<Carte> intentionsAdversaire, ArrayList<Carte> cartesTerrainAdversaire, jeu.logic.Joueur joueur, int score) {
         m_screen.doResizeIfNecessary();
         mettreAJourDimensions();
-
         this.effacer();
 
         int ligneIntentions = 1;
         int ligneAdverse = ligneIntentions + m_HAUTEUR_CARTE + 2;
         int ligneJoueur = ligneAdverse + m_HAUTEUR_CARTE + 2;
 
-        // Ligne intentions adversaire
+        // 1. Ligne Intentions Adversaire
         for (int i = 0; i < 4; i++) {
-            Carte c = plateau.getCartesIntentions().get(i);
+            Carte c = (intentionsAdversaire != null && i < intentionsAdversaire.size()) ? intentionsAdversaire.get(i) : null;
             if (c != null) { this.dessineCarte(c, ligneIntentions, i); }
             else { this.dessinerCaseVide("A" + (i + 1), ligneIntentions, i); }
         }
 
-        // Ligne adversaire
+        // 2. Ligne Terrain Adversaire
         for (int i = 0; i < 4; i++) {
-            Carte c = plateau.getCartesLigneHaut().get(i);
+            Carte c = (cartesTerrainAdversaire != null && i < cartesTerrainAdversaire.size()) ? cartesTerrainAdversaire.get(i) : null;
             if (c != null) { this.dessineCarte(c, ligneAdverse, i); }
             else { this.dessinerCaseVide("A" + (i + 1), ligneAdverse, i); }
         }
 
-        // Ligne joueur
+        // 3. Ligne Terrain Joueur
         for (int i = 0; i < 4; i++) {
-            Carte c = plateau.getCartesLigneBas().get(i);
+            Carte c = (cartesTerrainJoueur != null && i < cartesTerrainJoueur.size()) ? cartesTerrainJoueur.get(i) : null;
             if (c != null) { this.dessineCarte(c, ligneJoueur, i); }
             else { this.dessinerCaseVide("B" + (i + 1), ligneJoueur, i); }
         }
 
-        // Section Informations sous le plateau
+        // Section Infos
         int ligneScore = ligneJoueur + m_HAUTEUR_CARTE + 2;
-        this.m_graphics.putString(m_margeGauche, ligneScore, "Score balance : " + score);
-        this.m_graphics.putString(m_margeGauche, ligneScore + 1, "─".repeat(40));
+        this.m_graphics.putString(m_margeGauche, ligneScore, "Score balance : " + score + "   |   Os disponibles : " + joueur.getNbOsDisponibles());
+        this.m_graphics.putString(m_margeGauche, ligneScore + 1, "─".repeat(55));
 
-        // Section Affichage de la main
         this.m_graphics.putString(m_margeGauche, ligneScore + 2, "Votre main :");
         int ligneTexteMain = ligneScore + 3;
         int numeroCarte = 1;
 
-        if (main != null && main.getCartesEnMain() != null) {
-            for (int i = 0; i < main.getCartesEnMain().size(); i++) {
-                Carte c = main.getCartesEnMain().get(i);
+        if (joueur.getCartesEnMain() != null) {
+            for (Animal c : joueur.getCartesEnMain()) {
                 if (c != null) {
-                    String infoMain = String.format("  %d. %-12s PV: %d", numeroCarte, c.getNom(), c.getVie());
+                    String infoMain = String.format("  %d. %-12s PV: %d  Att: %d | Cout Sang: %d - Os: %d",
+                            numeroCarte, c.getNom(), c.getVie(), c.getAttack(), c.getCoutSang(), c.getCoutOs());
                     this.m_graphics.putString(m_margeGauche, ligneTexteMain, infoMain);
                     ligneTexteMain++;
-                    numeroCarte++;
                 }
+                numeroCarte++;
             }
-        } else {
-            this.m_graphics.putString(m_margeGauche, ligneTexteMain, "  (Main vide)");
-            ligneTexteMain++;
         }
 
         int ligneMenu = ligneTexteMain + 1;
         this.m_graphics.putString(m_margeGauche, ligneMenu, "--- C'EST VOTRE TOUR ---");
-        this.m_graphics.putString(m_margeGauche, ligneMenu + 1, "[1] Piocher une carte");
+        this.m_graphics.putString(m_margeGauche, ligneMenu + 1, "[1] Piocher une carte (" + joueur.getNombreCartes() + " restantes)");
         this.m_graphics.putString(m_margeGauche, ligneMenu + 2, "[2] Jouer une carte de votre main");
         this.m_graphics.putString(m_margeGauche, ligneMenu + 3, "[3] Terminer le tour");
 
         this.m_ligneBoiteSaisie = ligneMenu + 5;
+        this.rafraichir();
+    }
 
+    // NOUVELLE MÉTHODE : Permet d'afficher une alerte visuelle rouge bien visible au dessus de la saisie
+    public void afficherMessageAlerte(String message) {
+        if (m_graphics == null) return;
+        this.m_graphics.putString(m_margeGauche, this.m_ligneBoiteSaisie - 1, "⚠️  " + message + " ".repeat(30));
         this.rafraichir();
     }
 
     public String afficherChoix() {
         StringBuilder inputBuffer = new StringBuilder();
-
         int ligneBoite = this.m_ligneBoiteSaisie;
-        int largeurBoite = 50;
+        int largeurBoite = 65;
         int colBoite = m_margeGauche;
 
         while (true) {
             m_graphics.putString(colBoite, ligneBoite, "╭" + "─".repeat(largeurBoite - 2) + "╮");
-
             String texteAffiche = " Votre choix : " + inputBuffer.toString();
             int paddingEspaces = (largeurBoite - 2) - texteAffiche.length();
             if (paddingEspaces > 0) {
@@ -179,14 +173,12 @@ public class AffichageConsole {
                 if (keyStroke.getKeyType() == KeyType.Enter) {
                     m_screen.setCursorPosition(null);
                     return inputBuffer.toString().trim();
-                }
-                else if (keyStroke.getKeyType() == KeyType.Backspace) {
+                } else if (keyStroke.getKeyType() == KeyType.Backspace) {
                     if (inputBuffer.length() > 0) {
                         inputBuffer.deleteCharAt(inputBuffer.length() - 1);
                     }
-                }
-                else if (keyStroke.getKeyType() == KeyType.Character) {
-                    if (inputBuffer.length() < 2) {
+                } else if (keyStroke.getKeyType() == KeyType.Character) {
+                    if (inputBuffer.length() < 5) { // Permet d'écrire des commandes un peu plus longues (ex: B1, 1, 2)
                         inputBuffer.append(keyStroke.getCharacter());
                     }
                 }
