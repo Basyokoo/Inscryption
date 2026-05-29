@@ -48,36 +48,41 @@ public class GestionPartie {
         this.m_adv.planifierProchainTour(this.m_numTour);
         this.m_adv.envoyerIntentionsAuPlateau(this.m_plat);
         this.m_affichage.dessinerJeuComplet(this.m_plat, this.m_main, this.m_score.getValeurEcart());
-        this.m_affichage.rafraichir();
+
+        this.m_action = this.m_affichage.afficherChoix();
         return true;
     }
 
     public boolean boucleTour() {
-        this.m_action = this.m_j.choisirAction();
-
         switch (this.m_action) {
-            case "1": // Piocher
+            case "1": // Action Piocher
                 if (this.m_main.aPlace() && this.m_pioche.getNombreCartes() > 0) {
-                    Animal cartePiochee = (Animal) this.m_pioche.piocher(); // Cast en Animal si nécessaire
-
-                    // Trouver l'index du premier emplacement vide (null)
+                    Animal cartePiochee = (Animal) this.m_pioche.piocher();
                     int indexLibre = this.m_main.getCartesEnMain().indexOf(null);
-
-                    // Appeler la méthode avec les deux paramètres requis
                     if (indexLibre != -1) {
                         this.m_main.ajouterMain(cartePiochee, indexLibre);
                     }
                 }
+
+                this.m_affichage.dessinerJeuComplet(this.m_plat, this.m_main, this.m_score.getValeurEcart());
+                this.m_action = this.m_affichage.afficherChoix();
                 return true;
 
-            case "3":
-                System.out.println("Fin de votre phase d'action. Lancement des combats !");
+            case "2": // Action Poser une carte (Exemple de squelette pour ton choix 2)
+                this.m_affichage.dessinerJeuComplet(this.m_plat, this.m_main, this.m_score.getValeurEcart());
+                this.m_action = this.m_affichage.afficherChoix();
+                return true;
+
+            case "3": // Terminer le tour et lancer les combats
                 Combat combat = new Combat();
                 combat.gererAttaqueFinTour(this.m_plat, this.m_score);
                 combat.verifierMorts(this.m_plat, this.m_main, null);
                 return false;
 
             default:
+                // Si l'utilisateur tape n'importe quoi d'autre, on réaffiche simplement la boîte
+                this.m_affichage.dessinerJeuComplet(this.m_plat, this.m_main, this.m_score.getValeurEcart());
+                this.m_action = this.m_affichage.afficherChoix();
                 return true;
         }
     }
@@ -99,9 +104,7 @@ public class GestionPartie {
     }
 
     public void gererPierreSacrifice() {
-        // Appelé après la 2ème partie
         System.out.println("Phase Pierre de Sacrifice : Choisissez une carte à sacrifier pour récupérer son pouvoir.");
-        // Implémentation de la logique de transfert de pouvoir
     }
 
     public int getNumPartie() { return m_numPartie; }
