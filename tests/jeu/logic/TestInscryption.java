@@ -1,7 +1,6 @@
 package jeu.logic;
 import jeu.model.Animal;
 import jeu.model.Obstacle;
-import jeu.model.Plateau;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,6 @@ class CombatTest {
     void testAttaquesToutesCartesFinTour() {
         Combat combat = new Combat();
         Score score = new Score();
-        Plateau plateau = new Plateau();
 
         Animal lion = new Animal("Lion", 8, 5, 1, 0, false);
         Animal faucon = new Animal("Faucon", 4, 3, 2, 0, true);

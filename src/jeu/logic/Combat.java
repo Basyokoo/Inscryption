@@ -41,7 +41,7 @@ public class Combat {
         }
     }
 
-    public Integer appliquerDegats(Animal attaquant, Carte cible, Integer position) {
+    public int appliquerDegats(Animal attaquant, Carte cible, Integer position) {
         int puissance = attaquant.getAttack();
 
         if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
