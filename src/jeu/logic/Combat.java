@@ -60,20 +60,24 @@ public class Combat {
         switch (type) {
             case "CM":
                 if (cible instanceof Animal) {
-                    cible.modifierVie(cible.getVie()); // Réduit la vie à 0
+                    cible.modifierVie(cible.getVie());
                     return "Contact mortel : " + cible.getNom() + " meurt instantanément.";
                 }
                 return "Contact mortel sans effet sur un obstacle.";
 
             case "P":
-                return "Pouvoir Puant : Attaque adverse réduite.";
+                if (cible instanceof Animal) {
+                    Animal a = (Animal) cible;
+                    a.setAttack(a.getAttack() - 1); // Réduction effective
+                    return "Pouvoir Puant : Attaque de " + cible.getNom() + " réduite.";
+                }
+                return "Pouvoir Puant sans effet.";
 
             case "PP":
                 if (cible instanceof Animal) {
-                    ((Animal) cible).modifierVie(-1);
+                    ((Animal) cible).modifierVie(1); // Utilisez 1 pour infliger 1 dégât
                     return "Piques pointues : " + cible.getNom() + " subit 1 dégât en retour.";
                 }
-                return "Piques pointues : aucun effet sur cible non-animale.";
             case "C":
                 return "Pouvoir Coureur : Déplacement en attente.";
             case "NV":

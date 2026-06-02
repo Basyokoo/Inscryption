@@ -63,4 +63,8 @@ public class Animal extends Carte{
             return this.m_pouvoir;
         }
     }
+
+    public void setAttack(int nouvelleAttaque) {
+        this.m_pointsAttaque = nouvelleAttaque;
+    }
 }
