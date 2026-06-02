@@ -223,8 +223,8 @@ public class AffichageConsole {
         m_graphics.putString(coinDroit, ligneDep + 3, "│");
 
         m_graphics.putString(col, ligneDep + 4, "│");
-        if (c instanceof Animal ani) {
-            String attFormate = String.format("Att: %-" + (espaceUtile - 5) + "d", ani.getAttack());
+        if (c.estAnimal()) {
+            String attFormate = String.format("Att: %-" + (espaceUtile - 5) + "d", c.getAttack());
             m_graphics.putString(col + 1, ligneDep + 4, attFormate);
         } else {
             m_graphics.putString(col + 1, ligneDep + 4, " ".repeat(espaceUtile));
@@ -232,7 +232,7 @@ public class AffichageConsole {
         m_graphics.putString(coinDroit, ligneDep + 4, "│");
 
         m_graphics.putString(col, ligneDep + 5, "│");
-        if (c instanceof Animal ani && ani.getVolant()) {
+        if (c.estAnimal() && c.getVolant()) {
             String volantFormate = String.format("Volant%-" + (espaceUtile - 6) + "s", "");
             m_graphics.putString(col + 1, ligneDep + 5, volantFormate);
         } else {

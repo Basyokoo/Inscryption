@@ -130,6 +130,8 @@ public class Joueur {
         return "Pioche générée avec succès !";
     }
 
+    public int getPosition(Carte c){return m_ligneJ.indexOf(c);}
+
     public String creeMain(){
         Random rNum = new Random();
         Animal ani = new Animal("Ecureuil", 1, 0, 0, 0, false);
@@ -165,6 +167,10 @@ public class Joueur {
 
     public boolean aPlace() {
         return this.m_cartesEnMain.contains(null);
+    }
+
+    public boolean aPlace(int index) {
+        return this.m_cartesEnMain.get(index) == null;
     }
 
     public boolean placerObst(){
@@ -205,9 +211,50 @@ public class Joueur {
         for (int i = 0; i < m_ligneJ.size(); i++) {
             Carte c = m_ligneJ.get(i);
             if (c != null && !c.estVie()) {
+                c.
                 ajouterOs(1);
                 m_ligneJ.set(i, null);
             }
+        }
+    }
+
+
+    public String appliquerPouvoir(Animal source, Carte cible) {
+        if (source == null || source.getPouvoir() == null) {
+            return "Aucun pouvoir.";
+        }
+
+        String type = source.getPouvoir().getType();
+        switch (type) {
+            case "CM":
+                if (cible.estAnimal()) {
+                    cible.modifierVie(0); // Réduit la vie à 0
+                    return "Contact mortel : " + cible.getNom() + " meurt instantanément.";
+                }
+                return "Contact mortel sans effet sur un obstacle.";
+
+            case "P":
+                if (cible.estAnimal()){
+                    cible.modifAttack(-1);
+                    return "Pouvoir Puant : Attaque adverse réduite.";
+                }
+                return "Pouvoir puant sans effet sur un obstacle.";
+
+
+            case "PP":
+                if (cible.estAnimal()) {
+                    cible.modifierVie(-1);
+                    return "Piques pointues : " + cible.getNom() + " subit 1 dégât en retour.";
+                }
+                return "Piques pointues : aucun effet sur cible non-animale.";
+            case "C":
+                if (this.aPlace(source.));
+                return "Pouvoir Coureur : Déplacement en attente.";
+            case "NV":
+                return "Nombreuses vies : prêt pour le sacrifice.";
+
+            default:
+                return "Erreur pouvoir non gérer !";
         }
     }
 

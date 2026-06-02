@@ -46,6 +46,14 @@ public abstract class Carte {
 
     public abstract boolean estAnimal();
 
+    public abstract boolean getVolant();
+
+    public abstract Pouvoir getPouvoir();
+
+    public abstract void modifAttack(int i);
+
+    public abstract int getAttack();
+
     public boolean estVie(){
         return this.m_pointsVies > 0;
     }

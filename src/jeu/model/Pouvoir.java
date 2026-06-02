@@ -15,7 +15,6 @@ public class Pouvoir {
         return this.m_activeDans;
     }
 
-
     public String getType() {
         return m_type;
     }

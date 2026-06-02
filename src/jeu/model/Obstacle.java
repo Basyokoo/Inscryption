@@ -15,4 +15,24 @@ public class Obstacle extends Carte {
     public boolean estAnimal() {
         return false;
     }
+
+    @Override
+    public boolean getVolant() {
+        return false;
+    }
+
+    @Override
+    public Pouvoir getPouvoir() {
+        return null;
+    }
+
+    @Override
+    public void modifAttack(int i) {
+        return;
+    }
+
+    @Override
+    public int getAttack() {
+        return 0;
+    }
 }

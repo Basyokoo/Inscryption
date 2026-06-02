@@ -42,9 +42,6 @@ public class Animal extends Carte{
     public int getCoutOs(){
         return this.m_coutOs;
     }
-    public boolean getVolant(){
-        return this.m_volatile;
-    }
 
     public String setPouvoir(Pouvoir p) {
         this.m_pouvoir = p;
@@ -56,11 +53,22 @@ public class Animal extends Carte{
         return true;
     }
 
+    @Override
+    public boolean getVolant() {
+        return m_volatile;
+    }
+
+    @Override
     public Pouvoir getPouvoir(){
         if (this.m_pouvoir == null){
             return null;
         }else{
             return this.m_pouvoir;
         }
+    }
+
+    @Override
+    public void modifAttack(int i) {
+        this.m_pointsAttaque += i;
     }
 }

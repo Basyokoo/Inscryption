@@ -44,44 +44,11 @@ public class Combat {
 
     public int appliquerDegats(Animal attaquant, Carte cible) {
         int puissance = attaquant.getAttack();
-        if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
+        if (attaquant.getVolant() && (cible.estAnimal() && !((Animal) cible).getVolant())) {
             return 0;
         }
         cible.modifierVie(puissance);
         return puissance;
     }
-    public String appliquerPouvoir(Animal source, Carte cible) {
-        if (source == null || source.getPouvoir() == null) {
-            return "Aucun pouvoir.";
-        }
 
-        Pouvoir p = source.getPouvoir();
-        String type = p.getType();
-        switch (type) {
-            case "CM":
-                if (cible instanceof Animal) {
-                    cible.modifierVie(cible.getVie()); // Réduit la vie à 0
-                    return "Contact mortel : " + cible.getNom() + " meurt instantanément.";
-                }
-                return "Contact mortel sans effet sur un obstacle.";
-
-            case "P":
-                return "Pouvoir Puant : Attaque adverse réduite.";
-
-            case "PP":
-                if (cible instanceof Animal) {
-                    ((Animal) cible).modifierVie(-1);
-                    return "Piques pointues : " + cible.getNom() + " subit 1 dégât en retour.";
-                }
-                return "Piques pointues : aucun effet sur cible non-animale.";
-            case "C":
-                return "Pouvoir Coureur : Déplacement en attente.";
-            case "NV":
-                return "Nombreuses vies : prêt pour le sacrifice.";
-
-            default:
-                return "Pouvoir " + p.getType() + " non géré.";
-        }
-    }
 }
-==== BASE ====
