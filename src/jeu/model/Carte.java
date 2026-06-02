@@ -44,6 +44,7 @@ public abstract class Carte {
 
     public abstract String setPouvoir(Pouvoir p);
 
+    public abstract boolean estAnimal();
 
     public boolean estVie(){
         return this.m_pointsVies > 0;

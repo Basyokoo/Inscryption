@@ -7,8 +7,12 @@ public class Obstacle extends Carte {
         super(nom, pV,"OBS");
     }
 
-
     public String setPouvoir(Pouvoir p) {
         return "Impossible de mettre un pouvoir sur un obstacle !";
+    }
+
+    @Override
+    public boolean estAnimal() {
+        return false;
     }
 }
