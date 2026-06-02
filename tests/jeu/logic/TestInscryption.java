@@ -123,12 +123,11 @@ class CombatTest {
 
     @Test
     public void testPouvoirContactMortel() {
-        Combat combat = new Combat();
-        // Création de la source (Vipère) et de la cible
+        Joueur j = new Joueur(); // Utilisation de Joueur au lieu de Combat
         Animal vipere = new Animal("Vipère", 1, 1, 2, 0, false, new Pouvoir("Contact mortel", "CM", 0));
         Animal proie = new Animal("Grizzly", 6, 4, 3, 0, false);
 
-        String resultat = combat.appliquerPouvoir(vipere, proie);
+        String resultat = j.appliquerPouvoir(vipere, proie); // Appel sur l'objet Joueur
 
         assertTrue(resultat.contains("meurt instantanément"));
         assertEquals(0, proie.getVie(), "La cible devrait avoir 0 PV");
@@ -136,47 +135,24 @@ class CombatTest {
 
     @Test
     public void testPouvoirPiquesPointues() {
-        Combat combat = new Combat();
-        // Le loup doit être créé avec 2 PV pour que 2 - 1 = 1
+        Joueur j = new Joueur();
         Animal attaquant = new Animal("Loup", 2, 3, 2, 0, false);
-        // Le porc-épic possède le pouvoir PP
         Animal porcEpic = new Animal("Porc-épic", 2, 1, 1, 0, false, new Pouvoir("Piques pointues", "PP", 0));
 
-        // Application du pouvoir
-        combat.appliquerPouvoir(porcEpic, attaquant);
+        j.appliquerPouvoir(porcEpic, attaquant);
 
-        // Vérification de la vie : 2 PV initiaux - 1 dégât (PP) = 1 PV restant
         assertEquals(1, attaquant.getVie(), "Le loup devrait subir 1 dégât en retour.");
     }
 
     @Test
     public void testPouvoirPuant() {
-        Combat combat = new Combat();
-        // Le loup a 4 points d'attaque
+        Joueur j = new Joueur();
         Animal attaquant = new Animal("Loup", 5, 4, 3, 0, false);
-        // La punaise a le pouvoir "Puant" (type "P")
         Animal punaise = new Animal("Punaise", 5, 1, 2, 0, false, new Pouvoir("Puant", "P", 0));
 
-        // Application du pouvoir
-        combat.appliquerPouvoir(punaise, attaquant);
+        j.appliquerPouvoir(punaise, attaquant);
 
-        // Vérification : l'attaque du loup doit être réduite de 1 (4 - 1 = 3)
         assertEquals(3, attaquant.getAttack(), "Le loup devrait voir son attaque réduite à 3.");
-    }
-
-    @Test
-    public void testContactMortel() {
-        Combat combat = new Combat();
-        // 1. Initialisation avec le pouvoir CM (type "CM")
-        Animal vipere = new Animal("Vipère", 1, 1, 2, 0, false, new Pouvoir("Contact mortel", "CM", 0));
-        Animal attaquant = new Animal("Loup", 5, 4, 3, 0, false);
-
-        // 2. Application du pouvoir
-        String resultat = combat.appliquerPouvoir(vipere, attaquant);
-
-        // 3. Vérifications
-        assertTrue(resultat.contains("meurt instantanément"), "Le message doit indiquer le décès.");
-        assertEquals(0, attaquant.getVie(), "La créature blessée par le contact mortel devrait avoir 0 PV.");
     }
 
     class SaisieInvalideException extends Exception {

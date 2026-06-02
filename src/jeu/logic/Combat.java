@@ -50,5 +50,4 @@ public class Combat {
         cible.modifierVie(puissance);
         return puissance;
     }
-
 }
