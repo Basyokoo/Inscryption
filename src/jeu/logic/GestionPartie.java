@@ -40,6 +40,11 @@ public class GestionPartie {
         return this.m_affichage.initEcran();
     }
 
+    public String verifMort(Adversaire adv, Joueur jou){
+        adv.verifierMorts(); jou.verifierMorts();
+        return "Vérification succès";
+    }
+
     public boolean debutTour() {
         this.m_numTour++;
         this.m_adv.planifierProchainTour(this.m_numTour);
@@ -152,8 +157,7 @@ public class GestionPartie {
                 Combat combat = new Combat();
                 combat.gererAttaqueFinTour(this.m_j, this.m_adv, this.m_score);
 
-                this.m_j.verifierMorts();
-                this.m_adv.verifierMorts();
+                this.verifMort(m_adv,m_j);
                 return false;
             default:
                 rafraichirEcran();
@@ -188,9 +192,6 @@ public class GestionPartie {
         return true;
     }
 
-    public void gererPierreSacrifice() {
-        System.out.println("Phase Pierre de Sacrifice : Choisissez une carte a sacrifier pour recuperer son pouvoir.");
-    }
 
     public int getNumPartie() { return m_numPartie; }
 }

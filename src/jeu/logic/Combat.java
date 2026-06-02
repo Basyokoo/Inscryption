@@ -44,7 +44,7 @@ public class Combat {
     public int appliquerDegats(Animal attaquant, Carte cible, Integer position) {
         int puissance = attaquant.getAttack();
 
-        if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
+        if (attaquant.getVolant() && (cible.estAnimal() && !((Animal) cible).getVolant())) {
             cible.modifierVie(puissance);
             return puissance;
         }
@@ -52,4 +52,5 @@ public class Combat {
         cible.modifierVie(puissance);
         return puissance;
     }
+
 }

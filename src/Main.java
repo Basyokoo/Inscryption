@@ -24,9 +24,7 @@ public class Main {
             jeu.finPartie();
 
             // Gestion de la consigne spécifique pour la pierre de sacrifice à la partie 2
-            if (i == 2) {
-                jeu.gererPierreSacrifice();
-            }
+            if (i == 2) {break;}
         }
         System.out.println("=== Fin de la session de jeu ===");
     }

@@ -95,7 +95,7 @@ public class Adversaire {
 
     public boolean placerObst(){
         Random rNum = new Random();
-        int rnd1 = rNum.nextInt(3) + 1;
+        int rnd1 = rNum.nextInt(2) + 1;
 
         for (int i = 0; i < rnd1; i++){
             Obstacle obs;
