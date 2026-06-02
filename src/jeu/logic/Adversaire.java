@@ -43,7 +43,7 @@ public class Adversaire {
 
     public boolean avancerLigne(){
         for (int i = 0; i < 4; i++){
-            if(this.m_ligneE.get(i) == null && this.m_ligneEPT.get(i) != null){
+            if(this.m_ligneEPT.get(i) != null && estCaseLibre(i)){
                 placerCarteEnnemi(this.m_ligneEPT.get(i), i);
                 this.m_ligneEPT.set(i, null);
             }
@@ -84,7 +84,12 @@ public class Adversaire {
 
     public void envoyerIntentionsAuPlateau() {
         for (int i = 0; i < 4; i++) {
-            this.setCarteIntention(this.m_actionsPlanifiees[i], i);
+            if (estCaseLibre(i)) {
+                this.setCarteIntention(this.m_actionsPlanifiees[i], i);
+            } else {
+                // Optionnel : Gérer le cas où l'adversaire "perd" son action s'il est bloqué
+                this.setCarteIntention(null, i);
+            }
         }
     }
 
@@ -118,4 +123,9 @@ public class Adversaire {
             }
         }
     }
+    public boolean estCaseLibre(int pos) {
+        // Vérifie si la case dans la ligne active est vide
+        return this.m_ligneE.get(pos) == null;
+    }
+
 }

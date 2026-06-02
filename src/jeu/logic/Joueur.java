@@ -9,6 +9,7 @@ public class Joueur {
     private ArrayList<Carte> m_ligneJ;
     private ArrayList<Animal> m_pioche;
     private int m_nbOsDisponibles;
+    private int m_nbSangDisponibles;
     private boolean isNull = true;
     private int m_nbobsJ = 0;
     private int m_sang = 0;
@@ -17,6 +18,7 @@ public class Joueur {
 
     public Joueur() {
         this.m_nbOsDisponibles = 0;
+        this.m_nbSangDisponibles = 0;
         this.m_cartesEnMain = new ArrayList<>();
         this.m_ligneJ = new ArrayList<Carte>();
         this.m_pouvoir = new ArrayList<Pouvoir>();
@@ -27,6 +29,26 @@ public class Joueur {
         }
     }
 
+    // --- Gestion des ressources (Os et Sang) ---
+    public int getNbOsDisponibles() { return m_nbOsDisponibles; }
+
+    public void ajouterOs(int quantite) {
+        if (quantite > 0) this.m_nbOsDisponibles += quantite;
+    }
+
+    public void consommerOs(int quantite) {
+        if (quantite > 0) this.m_nbOsDisponibles -= quantite;
+    }
+
+    public int getNbSangDisponibles() { return m_nbSangDisponibles; }
+
+    public void ajouterSang(int quantite) {
+        if (quantite > 0) this.m_nbSangDisponibles += quantite;
+    }
+
+    public void consommerSang(int quantite) {
+        if (quantite > 0) this.m_nbSangDisponibles -= quantite;
+    }
     public void initialiserPiocheDeBase() {
         this.m_pioche = new ArrayList<>();
     }
@@ -70,27 +92,9 @@ public class Joueur {
             this.m_cartesEnMain.remove(carte);
         }
     }
-
-    public void ajouterOs(int quantite){
-        if (quantite > 0) {
-            this.m_nbOsDisponibles += quantite;
-        }
-    }
-
-    public void consommerOs(int quantite){
-        if (quantite > 0) {
-            this.m_nbOsDisponibles -= quantite;
-        }
-    }
-
     public ArrayList<Animal> getCartesEnMain() {
         return m_cartesEnMain;
     }
-
-    public int getNbOsDisponibles() {
-        return m_nbOsDisponibles;
-    }
-
     public String genererPioche(){
         Random rNum = new Random();
         Animal ani = null;
