@@ -15,6 +15,7 @@ public class Joueur {
     private int m_sang = 0;
     private int m_nbCartePioche = 0;
     private ArrayList<Pouvoir> m_pouvoir;
+    private ArrayList<Pouvoir> m_pouvoirADonner;
 
     public Joueur() {
         this.m_nbOsDisponibles = 0;
@@ -22,6 +23,7 @@ public class Joueur {
         this.m_cartesEnMain = new ArrayList<>();
         this.m_ligneJ = new ArrayList<Carte>();
         this.m_pouvoir = new ArrayList<Pouvoir>();
+        this.m_pouvoirADonner = new ArrayList<Pouvoir>();
         for (int i = 0; i < 4; i++){
             this.m_pouvoir.add(null);
             this.m_cartesEnMain.add(null);
@@ -218,7 +220,11 @@ public class Joueur {
         for (int i = 0; i < m_ligneJ.size(); i++) {
             Carte c = m_ligneJ.get(i);
             if (c != null && !c.estVie()) {
-                c.
+                if(c.estAnimal()){
+                    if (c.getPouvoir() != null) {
+                        this.m_pouvoirADonner.add(c.getPouvoir());
+                    }
+                }
                 ajouterOs(1);
                 m_ligneJ.set(i, null);
             }

@@ -4,7 +4,6 @@ import jeu.model.Animal;
 import jeu.model.Carte;
 import jeu.model.Pouvoir;
 import jeu.view.AffichageConsole;
-import jeu.logic.*;
 import java.util.ArrayList;
 
 public class GestionPartie {
@@ -118,8 +117,6 @@ public class GestionPartie {
                 }
 
                 Animal carteAJouer = this.m_j.getCartesEnMain().get(idxCarte);
-
-                // --- CORRECTION : Vérification combinée des ressources ---
                 if (carteAJouer.getCoutOs() > this.m_j.getNbOsDisponibles() ||
                         carteAJouer.getCoutSang() > this.m_j.getNbSangDisponibles()) {
 
