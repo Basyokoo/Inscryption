@@ -46,13 +46,9 @@ public class Animal extends Carte{
         return this.m_volatile;
     }
 
-    public String setPouvoir(Pouvoir p){
-        if (this.m_pouvoir == null) {
-            this.m_pouvoir = p;
-            return "Le pouvoir a été ajouter avec succés";
-        }
-        return "erreur lors de l'appel de la fonction setPouvoir";
-
+    public String setPouvoir(Pouvoir p) {
+        this.m_pouvoir = p;
+        return null;
     }
 
     @Override

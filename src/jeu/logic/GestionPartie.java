@@ -2,6 +2,7 @@ package jeu.logic;
 
 import jeu.model.Animal;
 import jeu.model.Carte;
+import jeu.model.Pouvoir;
 import jeu.view.AffichageConsole;
 import jeu.logic.*;
 import java.util.ArrayList;
@@ -80,6 +81,9 @@ public class GestionPartie {
 
                 rafraichirEcran();
                 this.m_action = this.m_affichage.afficherChoix();
+                if (this.m_numTour == 2) {
+                    gererPierreSacrifice();
+                }
                 return true;
 
             case "2":
@@ -192,6 +196,38 @@ public class GestionPartie {
         return true;
     }
 
+    public void gererPierreSacrifice() {
+        this.m_affichage.afficherMessageAlerte("Choisissez une carte à sacrifier (1-4) :");
+        String choix = this.m_affichage.afficherChoix();
+
+        try {
+            int index = Integer.parseInt(choix) - 1;
+            Carte cibleSacrifice = this.m_j.getCarteJoueur(index);
+
+            if (cibleSacrifice instanceof Animal) {
+                Animal animalSacrifie = (Animal) cibleSacrifice;
+                Pouvoir pouvoirRecupere = animalSacrifie.getPouvoir();
+
+                if (pouvoirRecupere != null) {
+                    // 2. Choisir la carte receveuse
+                    this.m_affichage.afficherMessageAlerte("Choisissez une carte à booster (1-4) :");
+                    String choixDest = this.m_affichage.afficherChoix();
+                    int indexDest = Integer.parseInt(choixDest) - 1;
+                    Carte cibleDest = this.m_j.getCarteJoueur(indexDest);
+
+                    if (cibleDest instanceof Animal) {
+                        ((Animal) cibleDest).setPouvoir(pouvoirRecupere);
+                        this.m_j.placerCarteJoueur(null, index);
+                        this.m_affichage.afficherMessageAlerte("Pouvoir " + pouvoirRecupere.getType() + " transféré !");
+                    }
+                } else {
+                    this.m_affichage.afficherMessageAlerte("Cette carte n'a pas de pouvoir.");
+                }
+            }
+        } catch (Exception e) {
+            this.m_affichage.afficherMessageAlerte("Sacrifice annulé ou invalide.");
+        }
+    }
 
     public int getNumPartie() { return m_numPartie; }
 }
