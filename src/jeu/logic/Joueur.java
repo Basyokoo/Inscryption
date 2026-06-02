@@ -11,6 +11,8 @@ public class Joueur {
     private int m_nbOsDisponibles;
     private boolean isNull = true;
     private int m_nbobsJ = 0;
+    private int m_sang = 0;
+    private int m_nbCartePioche = 0;
     private ArrayList<Pouvoir> m_pouvoir;
 
     public Joueur() {
@@ -37,6 +39,8 @@ public class Joueur {
         this.m_pioche.remove(0);
         return tempCarte;
     }
+
+    public int getSizePioche(){ return this.m_nbCartePioche;}
 
     public void ajouterCartes(Animal carte) {
         this.m_pioche.add(carte);
@@ -116,6 +120,7 @@ public class Joueur {
             }
             ajouterCartes(ani);
         }
+        this.m_nbCartePioche = m_pioche.size();
         return "Pioche générée avec succès !";
     }
 
@@ -180,6 +185,10 @@ public class Joueur {
 
     public Carte getCarteJoueur(int place){
         return m_ligneJ.get(place);
+    }
+
+    public int getSangJoueur(){
+        return this.m_sang;
     }
 
     public ArrayList<Carte> getCartesLigneBas() {

@@ -55,6 +55,11 @@ public class Animal extends Carte{
 
     }
 
+    @Override
+    public boolean estAnimal() {
+        return true;
+    }
+
     public Pouvoir getPouvoir(){
         if (this.m_pouvoir == null){
             return null;

@@ -109,17 +109,20 @@ public class AffichageConsole {
 
         // Section Infos
         int ligneScore = ligneJoueur + m_HAUTEUR_CARTE + 2;
-        this.m_graphics.putString(m_margeGauche, ligneScore, "Score balance : " + score + "   |   Os disponibles : " + joueur.getNbOsDisponibles());
-        this.m_graphics.putString(m_margeGauche, ligneScore + 1, "─".repeat(55));
+        this.m_graphics.putString(m_margeGauche, ligneScore, "Score balance : " + score + "   |   Os disponibles : " + joueur.getNbOsDisponibles() + "   |   Goutes de sang disponibles : " + joueur.getSangJoueur());
+        this.m_graphics.putString(m_margeGauche, ligneScore + 1, "-".repeat(79));
 
         this.m_graphics.putString(m_margeGauche, ligneScore + 2, "Votre main :");
         int ligneTexteMain = ligneScore + 3;
         int numeroCarte = 1;
 
+        this.m_graphics.putString(getColDep(2), ligneTexteMain - 1, "Cartes Restantes: " + joueur.getSizePioche());
+        this.dessinerCaseVide("Pioche",ligneTexteMain, 2);
+
         if (joueur.getCartesEnMain() != null) {
             for (Animal c : joueur.getCartesEnMain()) {
                 if (c != null) {
-                    String infoMain = String.format("  %d. %-12s PV: %d  Att: %d | Cout Sang: %d - Os: %d",
+                    String infoMain = String.format("  %d. %-12s PV: %d  Att: %d | Cout Sang: %d  Cout Os: %d",
                             numeroCarte, c.getNom(), c.getVie(), c.getAttack(), c.getCoutSang(), c.getCoutOs());
                     this.m_graphics.putString(m_margeGauche, ligneTexteMain, infoMain);
                     ligneTexteMain++;
