@@ -11,6 +11,11 @@ public class Pouvoir {
         this.m_nom = nom;
     }
 
+    public int getActive(){
+        return this.m_activeDans;
+    }
+
+
     public String getType() {
         return m_type;
     }
