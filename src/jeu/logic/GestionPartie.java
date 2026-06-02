@@ -143,8 +143,6 @@ public class GestionPartie {
                 if (posTerrain == -1) {
                     return true;
                 }
-
-                // --- CORRECTION : Consommation des deux ressources ---
                 this.m_j.consommerOs(carteAJouer.getCoutOs());
                 this.m_j.consommerSang(carteAJouer.getCoutSang());
 
@@ -209,7 +207,6 @@ public class GestionPartie {
                 Pouvoir pouvoirRecupere = animalSacrifie.getPouvoir();
 
                 if (pouvoirRecupere != null) {
-                    // 2. Choisir la carte receveuse
                     this.m_affichage.afficherMessageAlerte("Choisissez une carte à booster (1-4) :");
                     String choixDest = this.m_affichage.afficherChoix();
                     int indexDest = Integer.parseInt(choixDest) - 1;
