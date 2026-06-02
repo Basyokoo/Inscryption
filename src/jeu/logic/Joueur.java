@@ -81,6 +81,13 @@ public class Joueur {
         }
     }
 
+    public String changerSlot(Carte c, int pos){
+        int placeAChanger = getPosition(c);
+        this.m_ligneJ.set(pos,c);
+        this.m_ligneJ.set(placeAChanger,null);
+        return "changement fait";
+    }
+
     public boolean placerCarteJoueur(Carte c, int pos){
         if (pos >= 0 && pos < 4) {
             this.m_ligneJ.set(pos, c);
@@ -110,13 +117,13 @@ public class Joueur {
             }else{
                 int rndAni = rNum.nextInt(12);
                 switch (rndAni) {
-                    case 0: ani = new Animal("Chat", 1, 0, 1, 0, false, new Pouvoir("Nombreuses Vies", "NV", 0)); break;
+                    case 0: ani = new Animal("Chat", 1, 0, 1, 0, false, new Pouvoir("Nombreuses Vies", "NV", 1)); break;
                     case 1: ani = new Animal("Grizzly", 6, 4, 3, 0, false); break;
                     case 2: ani = new Animal("Coyote", 1, 2, 0, 4, false); break;
                     case 3: ani = new Animal("Moineau", 2, 1, 1, 0, true); break;
                     case 4: ani = new Animal("Corbeau", 3, 2, 2, 0, true); break;
                     case 5: ani = new Animal("Hermine", 3, 1, 1, 0, false); break;
-                    case 6: ani = new Animal("Louveteau", 1, 1, 1, 0, false, new Pouvoir("Croissance", "C", 1)); break;
+                    case 6: ani = new Animal("Louveteau", 1, 1, 1, 0, false, new Pouvoir("Croissance", "CR", 1)); break;
                     case 7: ani = new Animal("Loup", 2, 3, 2, 0, false); break;
                     case 8: ani = new Animal("Punaise", 2, 1, 0, 2, false, new Pouvoir("Puant", "P", 0)); break;
                     case 9: ani = new Animal("Elan", 4, 2, 2, 0, false, new Pouvoir("Coureur", "C", 0)); break;
@@ -146,13 +153,13 @@ public class Joueur {
             }else{
                 int rndAni = rNum.nextInt(12);
                 switch (rndAni) {
-                    case 0: ani = new Animal("Chat", 1, 0, 1, 0, false, new Pouvoir("Nombreuses Vies", "NV", 0)); break;
+                    case 0: ani = new Animal("Chat", 1, 0, 1, 0, false, new Pouvoir("Nombreuses Vies", "NV", 1)); break;
                     case 1: ani = new Animal("Grizzly", 6, 4, 3, 0, false); break;
                     case 2: ani = new Animal("Coyote", 1, 2, 0, 4, false); break;
                     case 3: ani = new Animal("Moineau", 2, 1, 1, 0, true); break;
                     case 4: ani = new Animal("Corbeau", 3, 2, 2, 0, true); break;
                     case 5: ani = new Animal("Hermine", 3, 1, 1, 0, false); break;
-                    case 6: ani = new Animal("Louveteau", 1, 1, 1, 0, false, new Pouvoir("Croissance", "C", 1)); break;
+                    case 6: ani = new Animal("Louveteau", 1, 1, 1, 0, false, new Pouvoir("Croissance", "CR", 1)); break;
                     case 7: ani = new Animal("Loup", 2, 3, 2, 0, false); break;
                     case 8: ani = new Animal("Punaise", 2, 1, 0, 2, false, new Pouvoir("Puant", "P", 0)); break;
                     case 9: ani = new Animal("Elan", 4, 2, 2, 0, false, new Pouvoir("Coureur", "C", 0)); break;
@@ -226,6 +233,14 @@ public class Joueur {
 
         String type = source.getPouvoir().getType();
         switch (type) {
+
+            case "CR":
+                if (source.estAnimal() && source.getNom().equals("Louveteau")){
+                    source.modifierNom("Loup"); source.ajouterCoutSang(1); source.ajouterAttack(2); source.modifierVie(3); source.setPouvoir(null);
+                    return "Le louveteau a grandit";
+                }
+                return "Problème de croissance";
+
             case "CM":
                 if (cible.estAnimal()) {
                     cible.modifierVie(0); // Réduit la vie à 0
@@ -235,7 +250,7 @@ public class Joueur {
 
             case "P":
                 if (cible.estAnimal()){
-                    cible.modifAttack(-1);
+                    cible.ajouterAttack(-1);
                     return "Pouvoir Puant : Attaque adverse réduite.";
                 }
                 return "Pouvoir puant sans effet sur un obstacle.";
@@ -243,15 +258,27 @@ public class Joueur {
 
             case "PP":
                 if (cible.estAnimal()) {
-                    cible.modifierVie(-1);
+                    cible.ajouterVie(-1);
                     return "Piques pointues : " + cible.getNom() + " subit 1 dégât en retour.";
                 }
                 return "Piques pointues : aucun effet sur cible non-animale.";
             case "C":
-                if (this.aPlace(source.));
-                return "Pouvoir Coureur : Déplacement en attente.";
+                if (this.aPlace(getPosition(source)+1)){
+                    this.changerSlot(source,getPosition(source)+1);
+                    return "Pouvoir Coureur : Déplacement à droite fait.";
+                } else if (!this.aPlace(getPosition(source)+1) && this.aPlace(getPosition(source)-1)) {
+                    this.changerSlot(source,getPosition(source)-1);
+                    return "Pouvoir Coureur : Déplacement à gauche fait.";
+                }
+                return "Pouvoir Coureur : Déplacement non fait.";
+
             case "NV":
-                return "Nombreuses vies : prêt pour le sacrifice.";
+                if (source.getVie() <= 0 && source.getPouvoir().getActive() > 0){
+                    source.modifierVie(source.getInitVie());
+                    source.getPouvoir().modifActive(-1);
+                    return "Nombreuses vies : sacrifice fait.";
+                }
+                return "Nombreuses vies : sacrifice non fait.";
 
             default:
                 return "Erreur pouvoir non gérer !";
@@ -260,4 +287,4 @@ public class Joueur {
 
 
 }
-==== BASE ====
+

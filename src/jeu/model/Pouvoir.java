@@ -15,6 +15,10 @@ public class Pouvoir {
         return this.m_activeDans;
     }
 
+    public String modifActive(int i){
+        this.m_activeDans += i; return "Modification faite";
+    }
+
     public String getType() {
         return m_type;
     }

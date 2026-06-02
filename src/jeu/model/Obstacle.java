@@ -27,7 +27,7 @@ public class Obstacle extends Carte {
     }
 
     @Override
-    public void modifAttack(int i) {
+    public void ajouterAttack(int i) {
         return;
     }
 

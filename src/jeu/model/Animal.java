@@ -43,6 +43,11 @@ public class Animal extends Carte{
         return this.m_coutOs;
     }
 
+    public String ajouterCoutSang(int i){
+        this.m_coutSang += i;
+        return "Changement du cout de sang fait";
+    }
+
     public String setPouvoir(Pouvoir p) {
         this.m_pouvoir = p;
         return null;
@@ -68,7 +73,7 @@ public class Animal extends Carte{
     }
 
     @Override
-    public void modifAttack(int i) {
+    public void ajouterAttack(int i) {
         this.m_pointsAttaque += i;
     }
 }
