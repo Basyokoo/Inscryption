@@ -53,8 +53,7 @@ public class GestionPartie {
 
     public boolean boucleTour() {
         switch (this.m_action) {
-            case "1": // PIOCHER UNE CARTE
-                // Vérifier s'il y a de la place dans la main (contient au moins un élément null)
+            case "1":
                 if (!this.m_j.aPlace()) {
                     rafraichirEcran();
                     this.m_affichage.afficherMessageAlerte("Main pleine ! Impossible de piocher.");
@@ -68,8 +67,6 @@ public class GestionPartie {
                     this.m_action = this.m_affichage.afficherChoix();
                     return true;
                 }
-
-                // Si de la place est disponible, on procède à la pioche
                 Animal cartePiochee = this.m_j.piocher();
                 int indexLibre = this.m_j.getCartesEnMain().indexOf(null);
                 if (indexLibre != -1) {
@@ -80,8 +77,7 @@ public class GestionPartie {
                 this.m_action = this.m_affichage.afficherChoix();
                 return true;
 
-            case "2": // PLACER UNE CARTE DE LA MAIN SUR LE TERRAIN
-                // 1. Vérifier s'il y a au moins une place de libre sur la ligne du joueur (ligneJ)
+            case "2":
                 boolean terrainAUnEspace = false;
                 ArrayList<String> casesLibres = new ArrayList<>();
                 for (int i = 0; i < 4; i++) {
@@ -93,45 +89,38 @@ public class GestionPartie {
 
                 if (!terrainAUnEspace) {
                     rafraichirEcran();
-                    this.m_affichage.afficherMessageAlerte("Terrain plein ! Nulle part ou poser de carte.");
+                    this.m_affichage.afficherMessageAlerte("Terrain plein !");
                     this.m_action = this.m_affichage.afficherChoix();
                     return true;
                 }
 
-                // 2. Demander quelle carte de la main jouer
                 rafraichirEcran();
-                this.m_affichage.afficherMessageAlerte("Choisissez le numéro de la carte a jouer (1 a 4) :");
+                this.m_affichage.afficherMessageAlerte("Choisissez le numéro de la carte à jouer (1 à 4) :");
                 String choixIndexCarte = this.m_affichage.afficherChoix();
-
                 int idxCarte;
                 try {
                     idxCarte = Integer.parseInt(choixIndexCarte) - 1;
                 } catch (NumberFormatException e) {
-                    rafraichirEcran();
-                    this.m_affichage.afficherMessageAlerte("Saisie invalide !");
-                    this.m_action = this.m_affichage.afficherChoix();
                     return true;
                 }
 
                 if (idxCarte < 0 || idxCarte >= 4 || this.m_j.getCartesEnMain().get(idxCarte) == null) {
-                    rafraichirEcran();
-                    this.m_affichage.afficherMessageAlerte("Emplacement de main vide ou invalide !");
-                    this.m_action = this.m_affichage.afficherChoix();
                     return true;
                 }
 
                 Animal carteAJouer = this.m_j.getCartesEnMain().get(idxCarte);
 
-                // 3. VÉRIFICATION DES COÛTS (OS OU SANG)
-                // (Note : N'ayant pas la valeur courante de sang stockée, nous vérifions principalement le coût en Os disponible)
-                if (carteAJouer.getCoutOs() > this.m_j.getNbOsDisponibles()) {
+                // --- CORRECTION : Vérification combinée des ressources ---
+                if (carteAJouer.getCoutOs() > this.m_j.getNbOsDisponibles() ||
+                        carteAJouer.getCoutSang() > this.m_j.getNbSangDisponibles()) {
+
                     rafraichirEcran();
-                    this.m_affichage.afficherMessageAlerte("Pas assez d'os ! Requis: " + carteAJouer.getCoutOs() + " | Possedes: " + this.m_j.getNbOsDisponibles());
+                    this.m_affichage.afficherMessageAlerte("Ressources insuffisantes ! " +
+                            "Requis: " + carteAJouer.getCoutOs() + " Os, " + carteAJouer.getCoutSang() + " Sang.");
                     this.m_action = this.m_affichage.afficherChoix();
                     return true;
                 }
 
-                // 4. Proposer les emplacements libres (ex: B1, B2...)
                 rafraichirEcran();
                 this.m_affichage.afficherMessageAlerte("Places libres : " + casesLibres + ". Entrez le code :");
                 String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
@@ -143,23 +132,21 @@ public class GestionPartie {
                 else if (emplacementChoisi.equals("B4") && casesLibres.contains("B4")) posTerrain = 3;
 
                 if (posTerrain == -1) {
-                    rafraichirEcran();
-                    this.m_affichage.afficherMessageAlerte("Case indisponible ou code errone !");
-                    this.m_action = this.m_affichage.afficherChoix();
                     return true;
                 }
 
-                // 5. Consommer les ressources et placer la carte
+                // --- CORRECTION : Consommation des deux ressources ---
                 this.m_j.consommerOs(carteAJouer.getCoutOs());
-                this.m_j.placerCarteJoueur(carteAJouer, posTerrain);
-                this.m_j.getCartesEnMain().set(idxCarte, null); // Enlever la carte de la main
+                this.m_j.consommerSang(carteAJouer.getCoutSang());
 
-                // Réafficher l'écran mis à jour et reproposer le menu principal du tour
+                this.m_j.placerCarteJoueur(carteAJouer, posTerrain);
+                this.m_j.getCartesEnMain().set(idxCarte, null);
+
                 rafraichirEcran();
                 this.m_action = this.m_affichage.afficherChoix();
                 return true;
 
-            case "3": // FINIR LE TOUR
+            case "3":
                 this.m_adv.avancerLigne();
 
                 Combat combat = new Combat();
@@ -167,8 +154,7 @@ public class GestionPartie {
 
                 this.m_j.verifierMorts();
                 this.m_adv.verifierMorts();
-                return false; // Met fin au cycle while de boucleTour() pour passer au tour suivant
-
+                return false;
             default:
                 rafraichirEcran();
                 this.m_action = this.m_affichage.afficherChoix();
