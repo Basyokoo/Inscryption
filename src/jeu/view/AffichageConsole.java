@@ -135,7 +135,8 @@ public class AffichageConsole {
         this.m_graphics.putString(m_margeGauche, ligneMenu, "--- C'EST VOTRE TOUR ---");
         this.m_graphics.putString(m_margeGauche, ligneMenu + 1, "[1] Piocher une carte (" + joueur.getNombreCartes() + " restantes)");
         this.m_graphics.putString(m_margeGauche, ligneMenu + 2, "[2] Jouer une carte de votre main");
-        this.m_graphics.putString(m_margeGauche, ligneMenu + 3, "[3] Terminer le tour");
+        this.m_graphics.putString(m_margeGauche, ligneMenu + 3, "[3] Sacrifier un animal");
+        this.m_graphics.putString(m_margeGauche, ligneMenu + 3, "[4] Terminer le tour");
 
         this.m_ligneBoiteSaisie = ligneMenu + 5;
         this.rafraichir();
@@ -181,7 +182,7 @@ public class AffichageConsole {
                         inputBuffer.deleteCharAt(inputBuffer.length() - 1);
                     }
                 } else if (keyStroke.getKeyType() == KeyType.Character) {
-                    if (inputBuffer.length() < 5) { // Permet d'écrire des commandes un peu plus longues (ex: B1, 1, 2)
+                    if (inputBuffer.length() < 5) {
                         inputBuffer.append(keyStroke.getCharacter());
                     }
                 }

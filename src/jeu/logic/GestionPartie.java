@@ -151,6 +151,9 @@ public class GestionPartie {
                 return true;
 
             case "3":
+
+
+            case "4":
                 this.m_adv.avancerLigne();
 
                 Combat combat = new Combat();
@@ -158,6 +161,7 @@ public class GestionPartie {
 
                 this.verifMort(m_adv,m_j);
                 return false;
+
             default:
                 rafraichirEcran();
                 this.m_action = this.m_affichage.afficherChoix();
