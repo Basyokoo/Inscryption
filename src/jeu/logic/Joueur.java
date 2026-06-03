@@ -106,7 +106,6 @@ public class Joueur {
     }
 
 
-
     public boolean placerCarteJoueur(Carte c, int pos){
         if (pos >= 0 && pos < 4) {
             this.m_ligneJ.set(pos, c);
