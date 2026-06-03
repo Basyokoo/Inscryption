@@ -190,6 +190,7 @@ public class GestionPartie {
 
                 rafraichirEcran();
                 this.m_action = this.m_affichage.afficherChoix();
+                bonPlace = true;
             }
             else{
                 this.m_affichage.afficherMessageAlerte("Erreur : places libres : " + casesLibres + ". Entrez le code :");
