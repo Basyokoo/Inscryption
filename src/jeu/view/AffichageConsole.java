@@ -9,6 +9,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import jeu.logic.Joueur;
 import jeu.model.Animal;
 import jeu.model.Carte;
 
@@ -116,8 +117,7 @@ public class AffichageConsole {
         int ligneTexteMain = ligneScore + 3;
         int numeroCarte = 1;
 
-        this.m_graphics.putString(getColDep(2), ligneTexteMain - 1, "Cartes Restantes: " + joueur.getSizePioche());
-        this.dessinerCaseVide("Pioche",ligneTexteMain, 2);
+        this.updatePioche(getColDep(2),ligneTexteMain, joueur);
 
         if (joueur.getCartesEnMain() != null) {
             for (Animal c : joueur.getCartesEnMain()) {
@@ -140,6 +140,11 @@ public class AffichageConsole {
 
         this.m_ligneBoiteSaisie = ligneMenu + 5;
         this.rafraichir();
+    }
+
+    public void updatePioche(int coor, int ligne, Joueur joueur){
+        this.m_graphics.putString(coor, ligne -1, "Cartes Restantes: " + joueur.getNombreCartes());
+        this.dessinerCaseVide("Pioche",ligne, 2);
     }
 
     // NOUVELLE MÉTHODE : Permet d'afficher une alerte visuelle rouge bien visible au dessus de la saisie
