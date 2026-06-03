@@ -130,15 +130,16 @@ public class GestionPartie {
 
                 rafraichirEcran();
                 this.m_affichage.afficherMessageAlerte("Places libres : " + casesLibres + ". Entrez le code :");
+
+                String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
+
+                int posTerrain = -1;
+                if (emplacementChoisi.equals("B1") && casesLibres.contains("B1")) posTerrain = 0;
+                else if (emplacementChoisi.equals("B2") && casesLibres.contains("B2")) posTerrain = 1;
+                else if (emplacementChoisi.equals("B3") && casesLibres.contains("B3")) posTerrain = 2;
+                else if (emplacementChoisi.equals("B4") && casesLibres.contains("B4")) posTerrain = 3;
+
                 if(m_j.aPlace(idxCarte)) {
-                    String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
-
-                    int posTerrain = -1;
-                    if (emplacementChoisi.equals("B1") && casesLibres.contains("B1")) posTerrain = 0;
-                    else if (emplacementChoisi.equals("B2") && casesLibres.contains("B2")) posTerrain = 1;
-                    else if (emplacementChoisi.equals("B3") && casesLibres.contains("B3")) posTerrain = 2;
-                    else if (emplacementChoisi.equals("B4") && casesLibres.contains("B4")) posTerrain = 3;
-
                     if (posTerrain == -1) {
                         return true;
                     }
