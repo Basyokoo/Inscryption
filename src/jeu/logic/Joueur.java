@@ -182,6 +182,10 @@ public class Joueur {
         return this.m_cartesEnMain.get(index) == null;
     }
 
+    public boolean aPlaceCarte(int index) {
+        return this.m_ligneJ.get(index) == null;
+    }
+
     public boolean placerObst(){
         Random rNum = new Random();
         int rnd1 = rNum.nextInt(2) + 1;

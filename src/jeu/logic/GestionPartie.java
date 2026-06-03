@@ -179,8 +179,8 @@ public class GestionPartie {
             }
 
             bon = false;
-            //if(m_j.aPlace(posTerrain)) {
-            if(m_j.getCartesLigneBas().get(posTerrain) == null) {
+            if(m_j.aPlaceCarte(posTerrain)) {
+
 
                 this.m_j.consommerOs(carteAJouer.getCoutOs());
                 this.m_j.consommerSang(carteAJouer.getCoutSang());
