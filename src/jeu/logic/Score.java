@@ -43,7 +43,7 @@ public class Score {
         return String.valueOf(this.m_scoreEnnemi);
     }
 
-    public void setValeurEcart(int nouvelleValeur) {
+    public void setValeurJoueur(int nouvelleValeur) {
         this.m_scoreJoueur = nouvelleValeur;
     }
 
