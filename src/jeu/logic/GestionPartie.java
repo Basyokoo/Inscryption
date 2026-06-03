@@ -88,7 +88,6 @@ public class GestionPartie {
             case "2":
                 this.placerCarte();
 
-
             case "3":
 
 
@@ -116,6 +115,17 @@ public class GestionPartie {
                 this.m_j,
                 this.m_score.getValeurEcart()
         );
+    }
+
+    private boolean sacrifice(){
+        boolean terrainAUnEspace = false;
+        ArrayList<String> casesPrises = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            if (this.m_j.getCarteJoueur(i) == null) {
+                terrainAUnEspace = true;
+                casesPrises.add("B" + (i + 1));
+            }
+        }
     }
 
     private boolean placerCarte(){
