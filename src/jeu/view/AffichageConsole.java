@@ -138,7 +138,7 @@ public class AffichageConsole {
         this.m_graphics.putString(m_margeGauche, ligneMenu + 3, "[3] Sacrifier un animal");
         this.m_graphics.putString(m_margeGauche, ligneMenu + 4, "[4] Terminer le tour");
 
-        this.m_ligneBoiteSaisie = ligneMenu + 5;
+        this.m_ligneBoiteSaisie = ligneMenu + 6;
         this.rafraichir();
     }
 

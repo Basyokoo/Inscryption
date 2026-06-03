@@ -86,77 +86,7 @@ public class GestionPartie {
                 return true;
 
             case "2":
-                boolean terrainAUnEspace = false;
-                ArrayList<String> casesLibres = new ArrayList<>();
-                for (int i = 0; i < 4; i++) {
-                    if (this.m_j.getCarteJoueur(i) == null) {
-                        terrainAUnEspace = true;
-                        casesLibres.add("B" + (i + 1));
-                    }
-                }
-
-                if (!terrainAUnEspace) {
-                    rafraichirEcran();
-                    this.m_affichage.afficherMessageAlerte("Terrain plein !");
-                    this.m_action = this.m_affichage.afficherChoix();
-                    return true;
-                }
-
-                rafraichirEcran();
-                this.m_affichage.afficherMessageAlerte("Choisissez le numéro de la carte à jouer (1 à 4) :");
-                String choixIndexCarte = this.m_affichage.afficherChoix();
-                int idxCarte;
-                try {
-                    idxCarte = Integer.parseInt(choixIndexCarte) - 1;
-                } catch (NumberFormatException e) {
-                    return true;
-                }
-
-                if (idxCarte < 0 || idxCarte >= 4 || this.m_j.getCartesEnMain().get(idxCarte) == null) {
-                    return true;
-                }
-
-                Animal carteAJouer = this.m_j.getCartesEnMain().get(idxCarte);
-                if (carteAJouer.getCoutOs() > this.m_j.getNbOsDisponibles() ||
-                        carteAJouer.getCoutSang() > this.m_j.getNbSangDisponibles()) {
-
-                    rafraichirEcran();
-                    this.m_affichage.afficherMessageAlerte("Ressources insuffisantes ! " +
-                            "Requis: " + carteAJouer.getCoutOs() + " Os, " + carteAJouer.getCoutSang() + " Sang.");
-                    this.m_action = this.m_affichage.afficherChoix();
-                    return true;
-                }
-
-
-                rafraichirEcran();
-                this.m_affichage.afficherMessageAlerte("Places libres : " + casesLibres + ". Entrez le code :");
-
-                String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
-
-                int posTerrain = -1;
-                if (emplacementChoisi.equals("B1") && casesLibres.contains("B1")) posTerrain = 0;
-                else if (emplacementChoisi.equals("B2") && casesLibres.contains("B2")) posTerrain = 1;
-                else if (emplacementChoisi.equals("B3") && casesLibres.contains("B3")) posTerrain = 2;
-                else if (emplacementChoisi.equals("B4") && casesLibres.contains("B4")) posTerrain = 3;
-
-                if(m_j.aPlace(idxCarte)) {
-                    if (posTerrain == -1) {
-                        return true;
-                    }
-                    this.m_j.consommerOs(carteAJouer.getCoutOs());
-                    this.m_j.consommerSang(carteAJouer.getCoutSang());
-
-                    this.m_j.placerCarteJoueur(carteAJouer, posTerrain);
-                    this.m_j.getCartesEnMain().set(idxCarte, null);
-
-                    rafraichirEcran();
-                    this.m_action = this.m_affichage.afficherChoix();
-                    return true;
-                }
-                else{
-                    this.m_affichage.afficherMessageAlerte("Erreur : places libres : " + casesLibres + ". Entrez le code :");
-                    this.m_action = this.m_affichage.afficherChoix();
-                }
+                this.placerCarte();
 
 
             case "3":
@@ -186,6 +116,89 @@ public class GestionPartie {
                 this.m_j,
                 this.m_score.getValeurEcart()
         );
+    }
+
+    private boolean placerCarte(){
+        boolean terrainAUnEspace = false;
+        ArrayList<String> casesLibres = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            if (this.m_j.getCarteJoueur(i) == null) {
+                terrainAUnEspace = true;
+                casesLibres.add("B" + (i + 1));
+            }
+        }
+
+        if (!terrainAUnEspace) {
+            rafraichirEcran();
+            this.m_affichage.afficherMessageAlerte("Terrain plein !");
+            this.m_action = this.m_affichage.afficherChoix();
+            return true;
+        }
+
+        rafraichirEcran();
+        this.m_affichage.afficherMessageAlerte("Choisissez le numéro de la carte à jouer (1 à 4) :");
+        String choixIndexCarte = this.m_affichage.afficherChoix();
+        int idxCarte;
+        try {
+            idxCarte = Integer.parseInt(choixIndexCarte) - 1;
+        } catch (NumberFormatException e) {
+            return true;
+        }
+
+        if (idxCarte < 0 || idxCarte >= 4 || this.m_j.getCartesEnMain().get(idxCarte) == null) {
+            return false;
+        }
+
+        Animal carteAJouer = this.m_j.getCartesEnMain().get(idxCarte);
+        if (carteAJouer.getCoutOs() > this.m_j.getNbOsDisponibles() || carteAJouer.getCoutSang() > this.m_j.getNbSangDisponibles()) {
+            rafraichirEcran();
+            this.m_affichage.afficherMessageAlerte("Ressources insuffisantes ! " + "Requis: " + carteAJouer.getCoutOs() + " Os, " + carteAJouer.getCoutSang() + " Sang.");
+            this.m_action = this.m_affichage.afficherChoix();
+            return true;
+        }
+
+
+        rafraichirEcran();
+        this.m_affichage.afficherMessageAlerte("Places libres : " + casesLibres + ". Entrez le code :");
+
+        boolean bon = false;
+        boolean bonPlace = false;
+        int posTerrain = -1;
+
+        while (!bonPlace){
+            while(!bon) {
+                String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
+
+
+                if (emplacementChoisi.equals("B1") && casesLibres.contains("B1")) { posTerrain = 0; bon = true;}
+                else if (emplacementChoisi.equals("B2") && casesLibres.contains("B2")) {posTerrain = 1; bon = true;}
+                else if (emplacementChoisi.equals("B3") && casesLibres.contains("B3")) {posTerrain = 2; bon = true;}
+                else if (emplacementChoisi.equals("B4") && casesLibres.contains("B4")) {posTerrain = 3; bon = true;}
+                else {this.m_affichage.afficherMessageAlerte("Emplacement incorrect veuillez choisir entre " + casesLibres); bon = false;}
+
+            }
+
+            bon = false;
+            //if(m_j.aPlace(posTerrain)) {
+            if(m_j.getCartesLigneBas().get(posTerrain) == null) {
+
+                this.m_j.consommerOs(carteAJouer.getCoutOs());
+                this.m_j.consommerSang(carteAJouer.getCoutSang());
+
+                this.m_j.placerCarteJoueur(carteAJouer, posTerrain);
+                this.m_j.enleverCarteJoueur(idxCarte);
+
+                rafraichirEcran();
+                this.m_action = this.m_affichage.afficherChoix();
+            }
+            else{
+                this.m_affichage.afficherMessageAlerte("Erreur : places libres : " + casesLibres + ". Entrez le code :");
+                this.m_action = this.m_affichage.afficherChoix();
+            }
+        }
+
+
+        return true;
     }
 
     public boolean verifFinPartie() {

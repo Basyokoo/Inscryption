@@ -98,6 +98,11 @@ public class Joueur {
         return false;
     }
 
+    public boolean enleverCarteJoueur(int index){
+        this.m_ligneJ.set(index, null);
+        return true;
+    }
+
     public ArrayList<Animal> getCartesEnMain() {
         return m_cartesEnMain;
     }
