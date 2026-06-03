@@ -76,6 +76,21 @@ public class Joueur {
         return this.m_pioche.size();
     }
 
+    public boolean addPvr(Pouvoir p){
+        if (this.m_pouvoirADonner.size() != 0){
+            for (int i = 0; i < this.m_pouvoirADonner.size(); i ++){
+                if (this.m_pouvoirADonner.get(i) == null) this.m_pouvoirADonner.set(i,p); return true;
+            }
+        }else{
+            this.m_pouvoirADonner.add(p);
+        }
+        return true;
+    }
+
+    public String getPvrType(int index){
+        return this.getCartesLigneBas(index).getPouvoir().getType();
+    }
+
     public void ajouterMain(Animal carte, int index){
         if (carte != null && index >= 0 && index < m_cartesEnMain.size()) {
             this.m_cartesEnMain.set(index, carte);
@@ -220,6 +235,10 @@ public class Joueur {
 
     public ArrayList<Carte> getCartesLigneBas() {
         return m_ligneJ;
+    }
+
+    public Carte getCartesLigneBas(int index) {
+        return m_ligneJ.get(index);
     }
 
     public void verifierMorts() {

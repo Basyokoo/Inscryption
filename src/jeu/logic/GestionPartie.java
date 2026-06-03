@@ -89,7 +89,7 @@ public class GestionPartie {
                 this.placerCarte();
 
             case "3":
-
+                this.sacrifice();
 
             case "4":
                 this.m_adv.avancerLigne();
@@ -121,11 +121,43 @@ public class GestionPartie {
         boolean terrainAUnEspace = false;
         ArrayList<String> casesPrises = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            if (this.m_j.getCarteJoueur(i) == null) {
+            if (this.m_j.getCarteJoueur(i) != null) {
                 terrainAUnEspace = true;
                 casesPrises.add("B" + (i + 1));
             }
         }
+        if (!terrainAUnEspace) {
+            rafraichirEcran();
+            this.m_affichage.afficherMessageAlerte("Pas de sacrifice à faire !");
+            this.m_action = this.m_affichage.afficherChoix();
+            return true;
+        }
+
+        rafraichirEcran();
+        this.m_affichage.afficherMessageAlerte("Places libres : " + casesPrises + ". Entrez le code :");
+
+        boolean bon = false;
+        boolean bonPlace = false;
+        int posTerrain = -1;
+
+        while(!bon) {
+            String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
+
+
+            if (emplacementChoisi.equals("B1") && casesPrises.contains("B1")) { posTerrain = 0; bon = true;}
+            else if (emplacementChoisi.equals("B2") && casesPrises.contains("B2")) {posTerrain = 1; bon = true;}
+            else if (emplacementChoisi.equals("B3") && casesPrises.contains("B3")) {posTerrain = 2; bon = true;}
+            else if (emplacementChoisi.equals("B4") && casesPrises.contains("B4")) {posTerrain = 3; bon = true;}
+            else {this.m_affichage.afficherMessageAlerte("Emplacement incorrect veuillez choisir entre " + casesPrises); bon = false;}
+
+        }
+
+        if (m_j.getPvrType(posTerrain) != "NV"){
+            m_j.addPvr(m_j.getCartesLigneBas(posTerrain).getPouvoir());
+            m_j.enleverCarteJoueur(posTerrain);
+
+        }
+        return true;
     }
 
     private boolean placerCarte(){
