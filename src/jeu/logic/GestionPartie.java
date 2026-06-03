@@ -180,15 +180,22 @@ public class GestionPartie {
 
             bon = false;
             if(m_j.aPlaceCarte(posTerrain)) {
-
-
                 this.m_j.consommerOs(carteAJouer.getCoutOs());
                 this.m_j.consommerSang(carteAJouer.getCoutSang());
 
                 this.m_j.placerCarteJoueur(carteAJouer, posTerrain);
                 this.m_j.enleverCarteJoueur(idxCarte);
-
+                this.m_score.gererScoreJoueur(
+                        this.m_j.getCartesLigneBas(),
+                        this.m_j.getNbOsDisponibles(),
+                        this.m_j.getNbSangDisponibles()
+                );
                 rafraichirEcran();
+                if (this.m_score.estVictoireJoueur()) {
+                    this.m_affichage.afficherMessageAlerte("Victoire par score atteint !");
+                    this.finPartie();
+                }
+
                 this.m_action = this.m_affichage.afficherChoix();
                 bonPlace = true;
             }
