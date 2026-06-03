@@ -98,11 +98,6 @@ public class Joueur {
         return false;
     }
 
-    public void retirerMain(Animal carte){
-        if (carte != null) {
-            this.m_cartesEnMain.remove(carte);
-        }
-    }
     public ArrayList<Animal> getCartesEnMain() {
         return m_cartesEnMain;
     }

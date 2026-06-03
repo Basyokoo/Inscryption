@@ -67,18 +67,37 @@ public class Adversaire {
         return this.m_actionsPlanifiees;
     }
 
-    public void planifierProchainTour(int numTour) {
+    public void planifierProchainTour() {
         for (int i = 0; i < 4; i++) {
             this.m_actionsPlanifiees[i] = null;
         }
 
-        if (numTour == 1) {
-            this.m_actionsPlanifiees[0] = new Animal("Loup", 4, 2, 2, 0, false);
-        } else if (numTour == 2) {
-            this.m_actionsPlanifiees[1] = new Obstacle("Souche", 3);
-            this.m_actionsPlanifiees[3] = new Animal("Corbeau", 3, 2, 1, 0, true);
-        } else {
-            this.m_actionsPlanifiees[2] = new Animal("Ours", 6, 4, 3, 0, false);
+        Random rNum = new Random();
+        Animal ani = null;
+        int nbEcu = 0;
+
+        for (int i = 0; i < 4; i++){
+            int rnd = rNum.nextInt(2);
+            if(rnd == 0){
+                setCarteIntention(null,i);
+            }else{
+                int rndAni = rNum.nextInt(12);
+                switch (rndAni) {
+                    case 0: ani = new Animal("Chat", 1, 0, 1, 0, false, new Pouvoir("Nombreuses Vies", "NV", 1)); break;
+                    case 1: ani = new Animal("Grizzly", 6, 4, 3, 0, false); break;
+                    case 2: ani = new Animal("Coyote", 1, 2, 0, 4, false); break;
+                    case 3: ani = new Animal("Moineau", 2, 1, 1, 0, true); break;
+                    case 4: ani = new Animal("Corbeau", 3, 2, 2, 0, true); break;
+                    case 5: ani = new Animal("Hermine", 3, 1, 1, 0, false); break;
+                    case 6: ani = new Animal("Louveteau", 1, 1, 1, 0, false, new Pouvoir("Croissance", "CR", 1)); break;
+                    case 7: ani = new Animal("Loup", 2, 3, 2, 0, false); break;
+                    case 8: ani = new Animal("Punaise", 2, 1, 0, 2, false, new Pouvoir("Puant", "P", 0)); break;
+                    case 9: ani = new Animal("Elan", 4, 2, 2, 0, false, new Pouvoir("Coureur", "C", 0)); break;
+                    case 10: ani = new Animal("Vipère", 1, 1, 2, 0, false, new Pouvoir("Contact mortel", "CM", 0)); break;
+                    case 11: ani = new Animal("Porc-épic", 2, 1, 1, 0, false, new Pouvoir("Piques pointues", "PP", 0)); break;
+                }
+            }
+            setCarteIntention(ani,i);
         }
     }
 
