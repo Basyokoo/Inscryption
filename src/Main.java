@@ -15,6 +15,7 @@ public class Main {
                 while (tourEnCours) {
                     tourEnCours = jeu.boucleTour();
                 }
+
                 if (jeu.getNumPartie() == 2) {
                     jeu.gererPierreSacrifice();
                 }

@@ -87,9 +87,11 @@ public class GestionPartie {
 
             case "2":
                 this.placerCarte();
+                break;
 
             case "3":
                 this.sacrifice();
+                break;
 
             case "4":
                 this.m_adv.avancerLigne();
@@ -105,6 +107,7 @@ public class GestionPartie {
                 this.m_action = this.m_affichage.afficherChoix();
                 return true;
         }
+        return true;
     }
 
     private void rafraichirEcran() {
@@ -121,7 +124,7 @@ public class GestionPartie {
         boolean terrainAUnEspace = false;
         ArrayList<String> casesPrises = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            if (this.m_j.getCarteJoueur(i) != null) {
+            if (this.m_j.getCarteJoueur(i) != null && this.m_j.getCarteJoueur(i).estAnimal()) {
                 terrainAUnEspace = true;
                 casesPrises.add("B" + (i + 1));
             }
@@ -134,7 +137,7 @@ public class GestionPartie {
         }
 
         rafraichirEcran();
-        this.m_affichage.afficherMessageAlerte("Places libres : " + casesPrises + ". Entrez le code :");
+        this.m_affichage.afficherMessageAlerte("Animal(aux) a sacrifier : " + casesPrises + ". Entrez le code :");
 
         boolean bon = false;
         boolean bonPlace = false;
@@ -152,11 +155,30 @@ public class GestionPartie {
 
         }
 
-        if (m_j.getPvrType(posTerrain) != "NV"){
-            m_j.addPvr(m_j.getCartesLigneBas(posTerrain).getPouvoir());
-            m_j.enleverCarteJoueur(posTerrain);
 
+        if  (m_j.getCartesLigneBas(posTerrain).getPouvoir() != null){
+            if (m_j.getPvrType(posTerrain) != "NV"){
+                m_j.addPvr(m_j.getCartesLigneBas(posTerrain).getPouvoir());
+                m_j.tuer(posTerrain);
+
+            }else{
+                if (m_j.getCartesLigneBas(posTerrain).getPouvoir().getActive() > 0){
+                    m_j.getCartesLigneBas(posTerrain).getPouvoir().modifActive(-1);
+                    m_j.incrSang();
+                    m_j.ajouterOs(1);
+                }else{
+                    m_j.tuer(posTerrain);
+                }
+
+            }
+        }else{
+            m_j.incrSang();
+            m_j.tuer(posTerrain);
         }
+
+        rafraichirEcran();
+        this.m_affichage.afficherMessageAlerte("Animal sacrifie ! Choisissez votre prochaine action.");
+        this.m_action = this.m_affichage.afficherChoix();
         return true;
     }
 
@@ -184,70 +206,63 @@ public class GestionPartie {
         try {
             idxCarte = Integer.parseInt(choixIndexCarte) - 1;
         } catch (NumberFormatException e) {
-            return true;
-        }
-
-        if (idxCarte < 0 || idxCarte >= 4 || this.m_j.getCartesEnMain().get(idxCarte) == null) {
-            return false;
-        }
-
-        Animal carteAJouer = this.m_j.getCartesEnMain().get(idxCarte);
-        if (carteAJouer.getCoutOs() > this.m_j.getNbOsDisponibles() || carteAJouer.getCoutSang() > this.m_j.getNbSangDisponibles()) {
-            rafraichirEcran();
-            this.m_affichage.afficherMessageAlerte("Ressources insuffisantes ! " + "Requis: " + carteAJouer.getCoutOs() + " Os, " + carteAJouer.getCoutSang() + " Sang.");
             this.m_action = this.m_affichage.afficherChoix();
             return true;
         }
 
+        if (idxCarte < 0 || idxCarte >= 4 || this.m_j.getCartesEnMain().get(idxCarte) == null) {
+            this.m_affichage.afficherMessageAlerte("Carte invalide !");
+            this.m_action = this.m_affichage.afficherChoix();
+            return true;
+        }
+
+        Animal carteAJouer = this.m_j.getCartesEnMain().get(idxCarte);
+        if (carteAJouer.getCoutOs() > this.m_j.getNbOsDisponibles() || carteAJouer.getCoutSang() > this.m_j.getSangJoueur()) {
+            rafraichirEcran();
+            this.m_affichage.afficherMessageAlerte("Ressources insuffisantes !");
+            this.m_action = this.m_affichage.afficherChoix();
+            return true;
+        }
 
         rafraichirEcran();
         this.m_affichage.afficherMessageAlerte("Places libres : " + casesLibres + ". Entrez le code :");
 
-        boolean bon = false;
         boolean bonPlace = false;
         int posTerrain = -1;
 
-        while (!bonPlace){
-            while(!bon) {
-                String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
+        while (!bonPlace) {
+            String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
 
-
-                if (emplacementChoisi.equals("B1") && casesLibres.contains("B1")) { posTerrain = 0; bon = true;}
-                else if (emplacementChoisi.equals("B2") && casesLibres.contains("B2")) {posTerrain = 1; bon = true;}
-                else if (emplacementChoisi.equals("B3") && casesLibres.contains("B3")) {posTerrain = 2; bon = true;}
-                else if (emplacementChoisi.equals("B4") && casesLibres.contains("B4")) {posTerrain = 3; bon = true;}
-                else {this.m_affichage.afficherMessageAlerte("Emplacement incorrect veuillez choisir entre " + casesLibres); bon = false;}
-
-            }
-
-            bon = false;
-            if(m_j.aPlaceCarte(posTerrain)) {
-                this.m_j.consommerOs(carteAJouer.getCoutOs());
-                this.m_j.consommerSang(carteAJouer.getCoutSang());
-
-                this.m_j.placerCarteJoueur(carteAJouer, posTerrain);
-                this.m_j.enleverCarteJoueur(idxCarte);
-                this.m_score.gererScoreJoueur(
-                        this.m_j.getCartesLigneBas(),
-                        this.m_j.getNbOsDisponibles(),
-                        this.m_j.getNbSangDisponibles()
-                );
-                rafraichirEcran();
-                if (this.m_score.estVictoireJoueur()) {
-                    this.m_affichage.afficherMessageAlerte("Victoire par score atteint !");
-                    this.finPartie();
-                }
-
-                this.m_action = this.m_affichage.afficherChoix();
-                bonPlace = true;
-            }
-            else{
-                this.m_affichage.afficherMessageAlerte("Erreur : places libres : " + casesLibres + ". Entrez le code :");
-                this.m_action = this.m_affichage.afficherChoix();
+            if (emplacementChoisi.equals("B1") && casesLibres.contains("B1")) { posTerrain = 0; bonPlace = true; }
+            else if (emplacementChoisi.equals("B2") && casesLibres.contains("B2")) { posTerrain = 1; bonPlace = true; }
+            else if (emplacementChoisi.equals("B3") && casesLibres.contains("B3")) { posTerrain = 2; bonPlace = true; }
+            else if (emplacementChoisi.equals("B4") && casesLibres.contains("B4")) { posTerrain = 3; bonPlace = true; }
+            else {
+                this.m_affichage.afficherMessageAlerte("Emplacement incorrect veuillez choisir entre " + casesLibres);
             }
         }
 
+        if(m_j.aPlaceCarte(posTerrain)) {
+            this.m_j.consommerOs(carteAJouer.getCoutOs());
+            this.m_j.consommerSang(carteAJouer.getCoutSang());
 
+            this.m_j.placerCarteJoueur(carteAJouer, posTerrain);
+            this.m_j.enleverCarteJoueur(idxCarte); // Enlève de la main
+
+            // Re-calcul du score optionnel s'il est présent
+            try {
+                this.m_score.gererScoreJoueur(
+                        this.m_j.getCartesLigneBas(),
+                        this.m_j.getNbOsDisponibles(),
+                        this.m_j.getSangJoueur()
+                );
+            } catch (Exception e) {
+            }
+
+            rafraichirEcran();
+            this.m_affichage.afficherMessageAlerte("Carte placee ! Choisissez votre prochaine action.");
+            this.m_action = this.m_affichage.afficherChoix();
+        }
         return true;
     }
 

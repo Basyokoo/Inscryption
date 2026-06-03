@@ -11,8 +11,6 @@ public class Joueur {
     private int m_nbOsDisponibles;
     private int m_nbSangDisponibles;
     private boolean isNull = true;
-    private int m_nbobsJ = 0;
-    private int m_sang = 0;
     private int m_nbCartePioche = 0;
     private ArrayList<Pouvoir> m_pouvoir;
     private ArrayList<Pouvoir> m_pouvoirADonner;
@@ -34,7 +32,7 @@ public class Joueur {
     }
 
     // --- Gestion des ressources (Os et Sang) ---
-    public int getNbOsDisponibles() { return m_nbOsDisponibles; }
+    public int getNbOsDisponibles() { return this.m_nbOsDisponibles; }
 
     public void ajouterOs(int quantite) {
         if (quantite > 0) this.m_nbOsDisponibles += quantite;
@@ -43,8 +41,6 @@ public class Joueur {
     public void consommerOs(int quantite) {
         if (quantite > 0) this.m_nbOsDisponibles -= quantite;
     }
-
-    public int getNbSangDisponibles() { return m_nbSangDisponibles; }
 
     public void ajouterSang(int quantite) {
         if (quantite > 0) this.m_nbSangDisponibles += quantite;
@@ -87,6 +83,15 @@ public class Joueur {
         return true;
     }
 
+    public void incrSang(){
+        this.m_nbSangDisponibles ++;
+    }
+
+    public void tuer(int index){
+        this.ajouterOs(1);
+        this.enleverCarteJoueurPlateau(index);
+    }
+
     public String getPvrType(int index){
         return this.getCartesLigneBas(index).getPouvoir().getType();
     }
@@ -112,6 +117,11 @@ public class Joueur {
             return true;
         }
         return false;
+    }
+
+    public boolean enleverCarteJoueurPlateau(int index){
+        this.m_ligneJ.set(index, null);
+        return true;
     }
 
     public boolean enleverCarteJoueur(int index){
@@ -216,9 +226,8 @@ public class Joueur {
             }
 
             int rndPos = rNum.nextInt(4);
-            if(this.m_nbobsJ < 4 && this.m_ligneJ.get(rndPos) == null){
+            if(this.m_nbOsDisponibles < 4 && this.m_ligneJ.get(rndPos) == null){
                 this.m_ligneJ.set(rndPos, obs);
-                this.m_nbobsJ++;
             }
         }
         return true;
@@ -229,7 +238,7 @@ public class Joueur {
     }
 
     public int getSangJoueur(){
-        return this.m_sang;
+        return this.m_nbSangDisponibles;
     }
 
     public ArrayList<Carte> getCartesLigneBas() {

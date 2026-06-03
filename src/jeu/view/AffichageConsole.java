@@ -103,9 +103,16 @@ public class AffichageConsole {
 
         // 3. Ligne Terrain Joueur
         for (int i = 0; i < 4; i++) {
-            Carte c = (cartesTerrainJoueur != null && i < cartesTerrainJoueur.size()) ? cartesTerrainJoueur.get(i) : null;
-            if (c != null) { this.dessineCarte(c, ligneJoueur, i); }
-            else { this.dessinerCaseVide("B" + (i + 1), ligneJoueur, i); }
+            try {
+                Carte c = (cartesTerrainJoueur != null && i < cartesTerrainJoueur.size()) ? cartesTerrainJoueur.get(i) : null;
+                if (c != null) {
+                    this.dessineCarte(c, ligneJoueur, i);
+                } else {
+                    this.dessinerCaseVide("B" + (i + 1), ligneJoueur, i);
+                }
+            } catch (Exception e) {
+                this.dessinerCaseVide("ERREUR", ligneJoueur, i);
+            }
         }
 
         // Section Infos
