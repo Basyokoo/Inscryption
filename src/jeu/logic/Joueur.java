@@ -90,6 +90,8 @@ public class Joueur {
         return "changement fait";
     }
 
+
+
     public boolean placerCarteJoueur(Carte c, int pos){
         if (pos >= 0 && pos < 4) {
             this.m_ligneJ.set(pos, c);
@@ -99,7 +101,7 @@ public class Joueur {
     }
 
     public boolean enleverCarteJoueur(int index){
-        this.m_ligneJ.set(index, null);
+        this.m_cartesEnMain.set(index, null);
         return true;
     }
 
