@@ -78,11 +78,12 @@ public class GestionPartie {
     }
 
     public boolean boucleTour() {
-        String actionAExecuter = this.m_action;
+        String actionAExecuter = this.m_action.trim().toLowerCase();
         this.m_messageAlerteCourant = "";
 
         switch (actionAExecuter) {
             case "1":
+            case "piocher":
                 if (this.piocherTour) {
                     if (!this.m_j.aPlace()) {
                         this.m_messageAlerteCourant = "Main pleine ! Impossible de piocher.";
@@ -116,16 +117,19 @@ public class GestionPartie {
                 }
 
             case "2":
+            case "placer":
                 this.placerCarte();
                 this.m_action = "";
                 return true;
 
             case "3":
+            case "sacrifier":
                 this.sacrifice();
                 this.m_action = "";
                 return true;
 
             case "4":
+            case "finir":
                 this.finTour();
                 return false;
 
@@ -198,20 +202,25 @@ public class GestionPartie {
         }
 
         rafraichirEcran();
-        this.m_affichage.afficherMessageAlerte("Animal(aux) a sacrifier : " + casesPrises + ". Entrez le code :");
+        this.m_affichage.afficherMessageAlerte("Animal(aux) à sacrifier : " + casesPrises + " ou 'annuler' pour quitter :");
 
         boolean bon = false;
         int posTerrain = -1;
 
         while(!bon) {
-            String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
+            String emplacementChoisi = this.m_affichage.afficherChoix().trim().toUpperCase();
+
+            if (emplacementChoisi.equals("ANNULER")) {
+                this.m_messageAlerteCourant = "Action annulée.";
+                return true; // Sortie immédiate
+            }
 
             if (emplacementChoisi.equals("B1") && casesPrises.contains("B1")) { posTerrain = 0; bon = true;}
             else if (emplacementChoisi.equals("B2") && casesPrises.contains("B2")) {posTerrain = 1; bon = true;}
             else if (emplacementChoisi.equals("B3") && casesPrises.contains("B3")) {posTerrain = 2; bon = true;}
             else if (emplacementChoisi.equals("B4") && casesPrises.contains("B4")) {posTerrain = 3; bon = true;}
             else {
-                this.m_affichage.afficherMessageAlerte("Emplacement incorrect veuillez choisir entre " + casesPrises);
+                this.m_affichage.afficherMessageAlerte("Emplacement incorrect, veuillez choisir entre " + casesPrises + " (ou 'annuler') :");
                 bon = false;
             }
         }
@@ -233,7 +242,7 @@ public class GestionPartie {
             m_j.tuer(posTerrain);
         }
 
-        this.m_messageAlerteCourant = "Animal sacrifie ! Choisissez votre prochaine action.";
+        this.m_messageAlerteCourant = "Animal sacrifié ! Choisissez votre prochaine action.";
         return true;
     }
 
@@ -253,8 +262,14 @@ public class GestionPartie {
         }
 
         rafraichirEcran();
-        this.m_affichage.afficherMessageAlerte("Choisissez le numéro de la carte à jouer (1 à 4) :");
-        String choixIndexCarte = this.m_affichage.afficherChoix();
+        this.m_affichage.afficherMessageAlerte("Numéro de la carte à jouer (1 à 4) ou 'annuler' :");
+        String choixIndexCarte = this.m_affichage.afficherChoix().trim();
+
+        if (choixIndexCarte.equalsIgnoreCase("annuler")) {
+            this.m_messageAlerteCourant = "Action annulée.";
+            return true;
+        }
+
         int idxCarte;
         try {
             idxCarte = Integer.parseInt(choixIndexCarte) - 1;
@@ -275,20 +290,25 @@ public class GestionPartie {
         }
 
         rafraichirEcran();
-        this.m_affichage.afficherMessageAlerte("Places libres : " + casesLibres + ". Entrez le code :");
+        this.m_affichage.afficherMessageAlerte("Places libres : " + casesLibres + ". Entrez le code (ou 'annuler') :");
 
         boolean bonPlace = false;
         int posTerrain = -1;
 
         while (!bonPlace) {
-            String emplacementChoisi = this.m_affichage.afficherChoix().toUpperCase();
+            String emplacementChoisi = this.m_affichage.afficherChoix().trim().toUpperCase();
+
+            if (emplacementChoisi.equals("ANNULER")) {
+                this.m_messageAlerteCourant = "Action annulée.";
+                return true; // Sortie et arrêt du placement
+            }
 
             if (emplacementChoisi.equals("B1") && casesLibres.contains("B1")) { posTerrain = 0; bonPlace = true; }
             else if (emplacementChoisi.equals("B2") && casesLibres.contains("B2")) { posTerrain = 1; bonPlace = true; }
             else if (emplacementChoisi.equals("B3") && casesLibres.contains("B3")) { posTerrain = 2; bonPlace = true; }
             else if (emplacementChoisi.equals("B4") && casesLibres.contains("B4")) { posTerrain = 3; bonPlace = true; }
             else {
-                this.m_affichage.afficherMessageAlerte("Emplacement incorrect veuillez choisir entre " + casesLibres);
+                this.m_affichage.afficherMessageAlerte("Emplacement incorrect, veuillez choisir entre " + casesLibres + " (ou 'annuler') :");
             }
         }
 
@@ -299,14 +319,19 @@ public class GestionPartie {
             this.m_j.placerCarteJoueur(carteAJouer, posTerrain);
             this.m_j.enleverCarteJoueur(idxCarte);
 
-            this.m_messageAlerteCourant = "Carte placee ! Choisissez votre prochaine action.";
+            this.m_messageAlerteCourant = "Carte placée ! Choisissez votre prochaine action.";
         }
         return true;
     }
 
     public void gererPierreSacrifice() {
-        this.m_affichage.afficherMessageAlerte("Choisissez une carte à sacrifier (1-4) :");
-        String choix = this.m_affichage.afficherChoix();
+        this.m_affichage.afficherMessageAlerte("Choisissez une carte à sacrifier (1-4) ou 'annuler' :");
+        String choix = this.m_affichage.afficherChoix().trim();
+
+        if (choix.equalsIgnoreCase("annuler")) {
+            this.m_messageAlerteCourant = "Sacrifice annulé.";
+            return;
+        }
 
         try {
             int index = Integer.parseInt(choix) - 1;
@@ -317,8 +342,14 @@ public class GestionPartie {
                 Pouvoir pouvoirRecupere = animalSacrifie.getPouvoir();
 
                 if (pouvoirRecupere != null) {
-                    this.m_affichage.afficherMessageAlerte("Choisissez une carte à booster (1-4) :");
-                    String choixDest = this.m_affichage.afficherChoix();
+                    this.m_affichage.afficherMessageAlerte("Choisissez une carte à booster (1-4) ou 'annuler' :");
+                    String choixDest = this.m_affichage.afficherChoix().trim();
+
+                    if (choixDest.equalsIgnoreCase("annuler")) {
+                        this.m_messageAlerteCourant = "Sacrifice annulé.";
+                        return;
+                    }
+
                     int indexDest = Integer.parseInt(choixDest) - 1;
                     Carte cibleDest = this.m_j.getCarteJoueur(indexDest);
 

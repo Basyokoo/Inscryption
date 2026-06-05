@@ -260,7 +260,7 @@ public class AffichageConsole {
                         inputBuffer.deleteCharAt(inputBuffer.length() - 1);
                     }
                 } else if (keyStroke.getKeyType() == KeyType.Character) {
-                    if (inputBuffer.length() < 5) {
+                    if (inputBuffer.length() < 15) {
                         inputBuffer.append(keyStroke.getCharacter());
                     }
                 }
@@ -319,7 +319,16 @@ public class AffichageConsole {
         }
         m_graphics.putString(coinDroit, ligneDep + 5, "│");
 
-        for (int l = 6; l < m_HAUTEUR_CARTE - 1; l++) {
+        m_graphics.putString(col, ligneDep + 6, "│");
+        if (c.estAnimal() && c.getPouvoir() != null && c.getPouvoir().getType() != null) {
+            String pouvoirFormate = String.format("Pvr: %-" + (espaceUtile - 5) + "s", c.getPouvoir().getType().toString());
+            m_graphics.putString(col + 1, ligneDep + 6, pouvoirFormate);
+        } else {
+            m_graphics.putString(col + 1, ligneDep + 6, " ".repeat(espaceUtile));
+        }
+        m_graphics.putString(coinDroit, ligneDep + 6, "│");
+
+        for (int l = 7; l < m_HAUTEUR_CARTE - 1; l++) {
             m_graphics.putString(col, ligneDep + l, "│");
             m_graphics.putString(col + 1, ligneDep + l, " ".repeat(espaceUtile));
             m_graphics.putString(coinDroit, ligneDep + l, "│");
