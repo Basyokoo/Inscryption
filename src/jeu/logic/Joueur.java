@@ -28,7 +28,6 @@ public class Joueur {
             this.m_ligneJ.add(null);
         }
 
-        this.placerObst();
     }
 
     // --- Gestion des ressources (Os et Sang) ---
@@ -62,10 +61,12 @@ public class Joueur {
         return tempCarte;
     }
 
-    public int getSizePioche(){ return this.m_nbCartePioche;}
-
     public void ajouterCartes(Animal carte) {
         this.m_pioche.add(carte);
+    }
+
+    public void ajouterCartesMain(Animal carte) {
+        this.m_ligneJ.add(carte);
     }
 
     public int getNombreCartes() {
@@ -81,6 +82,14 @@ public class Joueur {
             this.m_pouvoirADonner.add(p);
         }
         return true;
+    }
+
+    public void setSangJoueur(int i){
+        this.m_nbSangDisponibles = i;
+    }
+
+    public void setNbOsDisponibles(int i){
+        this.m_nbOsDisponibles = i;
     }
 
     public void incrSang(){
@@ -132,7 +141,9 @@ public class Joueur {
     public ArrayList<Animal> getCartesEnMain() {
         return m_cartesEnMain;
     }
+
     public String genererPioche(){
+        this.placerObst();
         Random rNum = new Random();
         Animal ani = null;
         int nbEcu = 0;
@@ -204,10 +215,6 @@ public class Joueur {
         return this.m_cartesEnMain.contains(null);
     }
 
-    public boolean aPlace(int index) {
-        return this.m_cartesEnMain.get(index) == null;
-    }
-
     public boolean aPlaceCarte(int index) {
         return this.m_ligneJ.get(index) == null;
     }
@@ -250,18 +257,34 @@ public class Joueur {
     }
 
     public void verifierMorts() {
-        for (int i = 0; i < m_ligneJ.size(); i++) {
-            Carte c = m_ligneJ.get(i);
-            if (c != null && !c.estVie()) {
-                if(c.estAnimal()){
-                    if (c.getPouvoir() != null) {
-                        this.m_pouvoirADonner.add(c.getPouvoir());
+        for (int i = 0; i < this.m_ligneJ.size(); i++) {
+            Carte c = this.m_ligneJ.get(i);
+
+            if (c != null && c.estAnimal()) {
+                Animal animal = (Animal) c;
+
+                if (animal.getVie() <= 0) {
+
+                    if (animal.getPouvoir() != null && animal.getPouvoir().getType().equals("NV") && animal.getPouvoir().getActive() > 0) {
+
+                        animal.getPouvoir().modifActive(-1);
+
+                        animal.modifierVie(-animal.getInitVie());
+
+                        System.out.println(animal.getNom() + " a survécu grâce à ses Nombreuses Vies ! Vies restantes : " + animal.getPouvoir().getActive());
+                        continue;
                     }
+
+                    this.m_ligneJ.set(i, null);
                 }
-                ajouterOs(1);
-                m_ligneJ.set(i, null);
+            } else if (c != null && !c.estVie()) {
+                this.m_ligneJ.set(i, null);
             }
         }
+    }
+
+    public void clear(){
+        this.m_ligneJ.clear();
     }
 
 
@@ -273,54 +296,57 @@ public class Joueur {
         String type = source.getPouvoir().getType();
         switch (type) {
 
-            case "CR":
-                if (source.estAnimal() && source.getNom().equals("Louveteau")){
-                    source.modifierNom("Loup"); source.ajouterCoutSang(1); source.ajouterAttack(2); source.modifierVie(3); source.setPouvoir(null);
-                    return "Le louveteau a grandit";
+            case "CR": // Croissance
+                if (source.getNom().equals("Louveteau")){
+                    source.modifierNom("Loup");
+                    source.ajouterCoutSang(1);
+                    source.ajouterAttack(2);
+                    source.modifierVie(-3);
+
+                    source.setPouvoir(null);
+                    return "Le louveteau a grandi en Loup !";
                 }
                 return "Problème de croissance";
 
-            case "CM":
-                if (cible.estAnimal()) {
-                    cible.modifierVie(0); // Réduit la vie à 0
+            case "CM": // Contact Mortel
+                if (cible != null && cible.estAnimal()) {
+                    int vieActuelle = cible.getVie();
+                    cible.modifierVie(vieActuelle);
                     return "Contact mortel : " + cible.getNom() + " meurt instantanément.";
                 }
-                return "Contact mortel sans effet sur un obstacle.";
+                return "Contact mortel sans effet.";
 
-            case "P":
-                if (cible.estAnimal()){
-                    cible.ajouterAttack(-1);
-                    return "Pouvoir Puant : Attaque adverse réduite.";
+            case "P": // Puant
+                if (cible != null && cible.estAnimal()){
+                    ((Animal)cible).ajouterAttack(-1);
+                    return "Pouvoir Puant : Attaque de " + cible.getNom() + " réduite de 1.";
                 }
-                return "Pouvoir puant sans effet sur un obstacle.";
+                return "Pouvoir puant sans effet.";
 
-
-            case "PP":
-                if (cible.estAnimal()) {
-                    cible.ajouterVie(-1);
+            case "PP": //
+                if (cible != null && cible.estAnimal()) {
+                    cible.modifierVie(1);
                     return "Piques pointues : " + cible.getNom() + " subit 1 dégât en retour.";
                 }
-                return "Piques pointues : aucun effet sur cible non-animale.";
-            case "C":
-                if (this.aPlace(getPosition(source)+1)){
-                    this.changerSlot(source,getPosition(source)+1);
-                    return "Pouvoir Coureur : Déplacement à droite fait.";
-                } else if (!this.aPlace(getPosition(source)+1) && this.aPlace(getPosition(source)-1)) {
-                    this.changerSlot(source,getPosition(source)-1);
-                    return "Pouvoir Coureur : Déplacement à gauche fait.";
+                return "Piques pointues : aucun effet.";
+
+            case "C": // Coureur
+                int posActuelle = getPosition(source);
+                if (posActuelle < 3 && this.aPlaceCarte(posActuelle + 1)){
+                    this.changerSlot(source, posActuelle + 1);
+                    return "Pouvoir Coureur : Déplacement à droite.";
                 }
-                return "Pouvoir Coureur : Déplacement non fait.";
+                else if (posActuelle > 0 && this.aPlaceCarte(posActuelle - 1)) {
+                    this.changerSlot(source, posActuelle - 1);
+                    return "Pouvoir Coureur : Déplacement à gauche.";
+                }
+                return "Pouvoir Coureur : Bloqué, déplacement impossible.";
 
             case "NV":
-                if (source.getVie() <= 0 && source.getPouvoir().getActive() > 0){
-                    source.modifierVie(source.getInitVie());
-                    source.getPouvoir().modifActive(-1);
-                    return "Nombreuses vies : sacrifice fait.";
-                }
-                return "Nombreuses vies : sacrifice non fait.";
+                return "Géré au moment de la mort.";
 
             default:
-                return "Erreur pouvoir non gérer !";
+                return "Erreur pouvoir non géré !";
         }
     }
 

@@ -33,9 +33,14 @@ public abstract class Carte {
         return "Changement de nom fait !";
     }
 
-    public String modifierVie(int i){
-        this.m_pointsVies = i;
-        return "Modification de la vie faite";
+    public String modifierVie(int degats) {
+        this.m_pointsVies -= degats;
+
+        if (this.m_pointsVies < 0) {
+            this.m_pointsVies = 0;
+        }
+
+        return "Modification de la vie faite. PV restants : " + this.m_pointsVies;
     }
 
     public String ajouterVie(int changement) {

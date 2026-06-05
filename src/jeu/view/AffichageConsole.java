@@ -9,6 +9,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import jeu.logic.Adversaire;
 import jeu.logic.Joueur;
 import jeu.model.Animal;
 import jeu.model.Carte;
@@ -28,6 +29,10 @@ public class AffichageConsole {
     private int m_decalageDynamique;
     private int m_margeGauche;
     private int m_ligneBoiteSaisie;
+
+    // Liste pour stocker et faire défiler l'historique des messages de logs
+    private final ArrayList<String> m_historiqueLogs = new ArrayList<>();
+    private static final int MAX_LIGNES_LOGS = 8; // Hauteur maximale du cadre de logs
 
     public boolean initEcran() {
         try {
@@ -78,14 +83,72 @@ public class AffichageConsole {
         return m_margeGauche + (m_LARGEUR_CARTE + m_decalageDynamique) * coor;
     }
 
-    public void dessinerJeuSansPlateau(ArrayList<Carte> cartesTerrainJoueur, ArrayList<Carte> intentionsAdversaire, ArrayList<Carte> cartesTerrainAdversaire, jeu.logic.Joueur joueur, int score) {
+    /**
+     * NOUVEAUTÉ : Permet d'ajouter un message dans la boîte de logs.
+     * Si la taille dépasse MAX_LIGNES_LOGS, la ligne la plus ancienne (index 0) est retirée.
+     */
+    public void ajouterLog(String message) {
+        if (message == null || message.trim().isEmpty()) return;
+
+        // Découpe le texte si jamais il contient des retours à la ligne \n
+        String[] lignes = message.split("\n");
+        for (String ligne : lignes) {
+            if (!ligne.trim().isEmpty()) {
+                this.m_historiqueLogs.add(ligne);
+            }
+        }
+
+        // Système FIFO : supprime l'élément le plus ancien tant qu'on dépasse le max
+        while (this.m_historiqueLogs.size() > MAX_LIGNES_LOGS) {
+            this.m_historiqueLogs.remove(0);
+        }
+    }
+
+    /**
+     * AJOUT : Dessine le cadre de logs en bas à droite de la console
+     */
+    private void dessinerCadreLogs(int ligneDebut) {
+        int largeurLogs = 55;
+        int colLogs = Math.max(m_margeGauche + 68, m_largeurEcran - largeurLogs - 4);
+
+        // Dessin du haut du cadre avec le titre "Logs"
+        m_graphics.putString(colLogs, ligneDebut, "╭─ Logs " + "─".repeat(largeurLogs - 9) + "╮");
+
+        // Dessin du contenu des logs (ligne par ligne)
+        for (int i = 0; i < MAX_LIGNES_LOGS; i++) {
+            String texteLigne = "";
+            if (i < m_historiqueLogs.size()) {
+                texteLigne = m_historiqueLogs.get(i);
+            }
+
+            // Tronquer le texte s'il dépasse l'espace utile du cadre
+            int espaceUtile = largeurLogs - 2;
+            if (texteLigne.length() > espaceUtile) {
+                texteLigne = texteLigne.substring(0, espaceUtile - 3) + "...";
+            }
+
+            String ligneFormatee = String.format("│%-" + espaceUtile + "s│", texteLigne);
+            m_graphics.putString(colLogs, ligneDebut + 1 + i, ligneFormatee);
+        }
+
+        // Dessin du bas du cadre
+        m_graphics.putString(colLogs, ligneDebut + 1 + MAX_LIGNES_LOGS, "╰" + "─".repeat(largeurLogs - 2) + "╯");
+    }
+
+    public void dessinerJeuSansPlateau(ArrayList<Carte> cartesTerrainJoueur, ArrayList<Carte> intentionsAdversaire,
+                                       ArrayList<Carte> cartesTerrainAdversaire, jeu.logic.Joueur joueur,
+                                       int score, int numPartie, int victoireJ, int victoireE) {
+
         m_screen.doResizeIfNecessary();
         mettreAJourDimensions();
         this.effacer();
 
-        int ligneIntentions = 1;
-        int ligneAdverse = ligneIntentions + m_HAUTEUR_CARTE + 2;
-        int ligneJoueur = ligneAdverse + m_HAUTEUR_CARTE + 2;
+        this.m_graphics.putString(2, 0, String.format("MANCHE EN COURS : %d   |   Manches Gagnées Joueur : %d / 2   |   Manches Gagnées Robot : %d / 2", (numPartie + 1), victoireJ, victoireE));
+        this.m_graphics.putString(2, 1, "═".repeat(m_largeurEcran - 4));
+
+        int ligneIntentions = 3;
+        int ligneAdverse = ligneIntentions + m_HAUTEUR_CARTE + 1;
+        int ligneJoueur = ligneAdverse + m_HAUTEUR_CARTE + 1;
 
         // 1. Ligne Intentions Adversaire
         for (int i = 0; i < 4; i++) {
@@ -116,15 +179,15 @@ public class AffichageConsole {
         }
 
         // Section Infos
-        int ligneScore = ligneJoueur + m_HAUTEUR_CARTE + 2;
-        this.m_graphics.putString(m_margeGauche, ligneScore, "Score balance : " + score + "   |   Os disponibles : " + joueur.getNbOsDisponibles() + "   |   Goutes de sang disponibles : " + joueur.getSangJoueur());
+        int ligneScore = ligneJoueur + m_HAUTEUR_CARTE + 1;
+        this.m_graphics.putString(m_margeGauche, ligneScore, "Score balance : " + score + "   |   Os disponibles : " + joueur.getNbOsDisponibles() + "   |   Gouttes de sang disponibles : " + joueur.getSangJoueur());
         this.m_graphics.putString(m_margeGauche, ligneScore + 1, "-".repeat(79));
 
         this.m_graphics.putString(m_margeGauche, ligneScore + 2, "Votre main :");
         int ligneTexteMain = ligneScore + 3;
         int numeroCarte = 1;
 
-        this.updatePioche(getColDep(2),ligneTexteMain, joueur);
+        this.updatePioche(getColDep(2), ligneTexteMain, joueur);
 
         if (joueur.getCartesEnMain() != null) {
             for (Animal c : joueur.getCartesEnMain()) {
@@ -145,19 +208,22 @@ public class AffichageConsole {
         this.m_graphics.putString(m_margeGauche, ligneMenu + 3, "[3] Sacrifier un animal");
         this.m_graphics.putString(m_margeGauche, ligneMenu + 4, "[4] Terminer le tour");
 
+        // --- DESSIN DE LA BOÎTE DE LOGS EN BAS À DROITE ---
+        dessinerCadreLogs(ligneMenu);
+
         this.m_ligneBoiteSaisie = ligneMenu + 6;
         this.rafraichir();
     }
 
     public void updatePioche(int coor, int ligne, Joueur joueur){
-        this.m_graphics.putString(coor, ligne -1, "Cartes Restantes: " + joueur.getNombreCartes());
-        this.dessinerCaseVide("Pioche",ligne, 2);
+        this.m_graphics.putString(coor, ligne - 1, "Cartes Restantes: " + joueur.getNombreCartes());
+        this.dessinerCaseVide("Pioche", ligne, 2);
     }
 
-    // NOUVELLE MÉTHODE : Permet d'afficher une alerte visuelle rouge bien visible au dessus de la saisie
     public void afficherMessageAlerte(String message) {
         if (m_graphics == null) return;
         this.m_graphics.putString(m_margeGauche, this.m_ligneBoiteSaisie - 1, "⚠️  " + message + " ".repeat(30));
+        this.ajouterLog("[ALERTE] " + message);
         this.rafraichir();
     }
 
@@ -314,5 +380,68 @@ public class AffichageConsole {
 
     public void effacer() {
         if (m_screen != null) { m_screen.clear(); }
+    }
+
+    public void afficherFin(Object entiteGagnante, boolean estFinPartieTotale) {
+        if (m_graphics == null) return;
+
+        this.effacer();
+        m_screen.doResizeIfNecessary();
+        mettreAJourDimensions();
+
+        int largeurBoite = 65;
+        int hauteurBoite = 9;
+        int colDep = Math.max(2, (m_largeurEcran - largeurBoite) / 2);
+        int ligneDep = Math.max(2, (m_hauteurEcran - hauteurBoite) / 2);
+
+        m_graphics.putString(colDep, ligneDep, "╔" + "═".repeat(largeurBoite - 2) + "╗");
+        for (int i = 1; i < hauteurBoite - 1; i++) {
+            m_graphics.putString(colDep, ligneDep + i, "║" + " ".repeat(largeurBoite - 2) + "║");
+        }
+        m_graphics.putString(colDep, ligneDep + hauteurBoite - 1, "╚" + "═".repeat(largeurBoite - 2) + "╝");
+
+        String titre;
+        String messageLigne1;
+        String messageLigne2 = estFinPartieTotale ? "Pressez [ENTRÉE] pour quitter le jeu..." : "Pressez [ENTRÉE] pour lancer la manche suivante...";
+
+        boolean joueurAGagne = !(entiteGagnante instanceof Adversaire);
+
+        if (estFinPartieTotale) {
+            titre = joueurAGagne ? "  VICTOIRE TOTALE !  " : "  JEU TERMINÉ  ";
+            messageLigne1 = joueurAGagne ? "Incroyable !! Vous avez gagné le match contre le robot !" : "Dommage... Le robot a remporté le match.";
+        } else {
+            titre = joueurAGagne ? "  MANCHE GAGNÉE  " : "  MANCHE PERDUE  ";
+            messageLigne1 = joueurAGagne ? "Bien joué, vous remportez cette manche !" : "Le robot s'empare de cette manche.";
+        }
+
+        int posTitre = colDep + (largeurBoite - titre.length()) / 2;
+        m_graphics.putString(posTitre, ligneDep + 2, titre);
+
+        int posL1 = colDep + (largeurBoite - messageLigne1.length()) / 2;
+        m_graphics.putString(posL1, ligneDep + 4, messageLigne1);
+
+        int posL2 = colDep + (largeurBoite - messageLigne2.length()) / 2;
+        m_graphics.putString(posL2, ligneDep + 6, messageLigne2);
+
+        m_screen.setCursorPosition(null);
+        this.rafraichir();
+
+        try {
+            while (true) {
+                KeyStroke key = m_screen.readInput();
+                if (key.getKeyType() == KeyType.Enter) {
+                    if (estFinPartieTotale) {
+                        m_screen.stopScreen();
+                    }
+                    break;
+                }
+            }
+
+            while (m_screen.pollInput() != null) {
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

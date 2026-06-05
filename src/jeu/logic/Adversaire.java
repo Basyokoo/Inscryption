@@ -22,7 +22,6 @@ public class Adversaire {
             this.m_ligneE.add(null);
             this.m_ligneEPT.add(null);
         }
-        this.placerObst();
     }
 
     public boolean placerCarteEnnemi(Carte c, int pos){
@@ -51,6 +50,15 @@ public class Adversaire {
         return true;
     }
 
+    public void clear() {
+        for (int i = 0; i < this.m_ligneE.size(); i++) {
+            this.m_ligneE.set(i, null);
+        }
+        this.m_nbObsE = 0;
+    }
+
+    public void addCarte(Animal ani){ this.m_ligneE.add(ani);}
+
     public Carte getCarteEnnemi(int place){
         return m_ligneE.get(place);
     }
@@ -63,41 +71,38 @@ public class Adversaire {
         return m_ligneE;
     }
 
-    public Carte[] getActionsPlani() {
-        return this.m_actionsPlanifiees;
-    }
-
     public void planifierProchainTour() {
         for (int i = 0; i < 4; i++) {
             this.m_actionsPlanifiees[i] = null;
         }
 
         Random rNum = new Random();
-        Animal ani = null;
-        int nbEcu = 0;
 
-        for (int i = 0; i < 4; i++){
-            int rnd = rNum.nextInt(2);
-            if(rnd == 0){
-                setCarteIntention(null,i);
-            }else{
-                int rndAni = rNum.nextInt(12);
-                switch (rndAni) {
-                    case 0: ani = new Animal("Chat", 1, 0, 1, 0, false, new Pouvoir("Nombreuses Vies", "NV", 1)); break;
-                    case 1: ani = new Animal("Grizzly", 6, 4, 3, 0, false); break;
-                    case 2: ani = new Animal("Coyote", 1, 2, 0, 4, false); break;
-                    case 3: ani = new Animal("Moineau", 2, 1, 1, 0, true); break;
-                    case 4: ani = new Animal("Corbeau", 3, 2, 2, 0, true); break;
-                    case 5: ani = new Animal("Hermine", 3, 1, 1, 0, false); break;
-                    case 6: ani = new Animal("Louveteau", 1, 1, 1, 0, false, new Pouvoir("Croissance", "CR", 1)); break;
-                    case 7: ani = new Animal("Loup", 2, 3, 2, 0, false); break;
-                    case 8: ani = new Animal("Punaise", 2, 1, 0, 2, false, new Pouvoir("Puant", "P", 0)); break;
-                    case 9: ani = new Animal("Elan", 4, 2, 2, 0, false, new Pouvoir("Coureur", "C", 0)); break;
-                    case 10: ani = new Animal("Vipère", 1, 1, 2, 0, false, new Pouvoir("Contact mortel", "CM", 0)); break;
-                    case 11: ani = new Animal("Porc-épic", 2, 1, 1, 0, false, new Pouvoir("Piques pointues", "PP", 0)); break;
+        for (int i = 0; i < 4; i++) {
+            if (estCaseLibre(i)) {
+                int rnd = rNum.nextInt(2);
+                if (rnd == 1) {
+                    this.m_actionsPlanifiees[i] = null;
+                } else {
+                    Animal ani = null;
+                    int rndAni = rNum.nextInt(12);
+                    switch (rndAni) {
+                        case 0: ani = new Animal("Chat", 1, 0, 1, 0, false, new Pouvoir("Nombreuses Vies", "NV", 1)); break;
+                        case 1: ani = new Animal("Grizzly", 6, 4, 3, 0, false); break;
+                        case 2: ani = new Animal("Coyote", 1, 2, 0, 4, false); break;
+                        case 3: ani = new Animal("Moineau", 2, 1, 1, 0, true); break;
+                        case 4: ani = new Animal("Corbeau", 3, 2, 2, 0, true); break;
+                        case 5: ani = new Animal("Hermine", 3, 1, 1, 0, false); break;
+                        case 6: ani = new Animal("Louveteau", 1, 1, 1, 0, false, new Pouvoir("Croissance", "CR", 1)); break;
+                        case 7: ani = new Animal("Loup", 2, 3, 2, 0, false); break;
+                        case 8: ani = new Animal("Punaise", 2, 1, 0, 2, false, new Pouvoir("Puant", "P", 0)); break;
+                        case 9: ani = new Animal("Elan", 4, 2, 2, 0, false, new Pouvoir("Coureur", "C", 0)); break;
+                        case 10: ani = new Animal("Vipère", 1, 1, 2, 0, false, new Pouvoir("Contact mortel", "CM", 0)); break;
+                        case 11: ani = new Animal("Porc-épic", 2, 1, 1, 0, false, new Pouvoir("Piques pointues", "PP", 0)); break;
+                    }
+                    this.m_actionsPlanifiees[i] = ani;
                 }
             }
-            setCarteIntention(ani,i);
         }
     }
 
@@ -106,9 +111,83 @@ public class Adversaire {
             if (estCaseLibre(i)) {
                 this.setCarteIntention(this.m_actionsPlanifiees[i], i);
             } else {
-                // Optionnel : Gérer le cas où l'adversaire "perd" son action s'il est bloqué
                 this.setCarteIntention(null, i);
             }
+        }
+    }
+
+    public boolean aPlace(int index) {
+        return this.m_ligneE.get(index) == null;
+    }
+
+    public String changerSlot(Carte c, int pos){
+        int placeAChanger = getPosition(c);
+        this.m_ligneE.set(pos,c);
+        this.m_ligneE.set(placeAChanger,null);
+        return "changement fait";
+    }
+
+    public int getPosition(Carte c){return m_ligneE.indexOf(c);}
+
+    public String appliquerPouvoir(Animal source, Carte cible) {
+        if (source == null || source.getPouvoir() == null) {
+            return "Aucun pouvoir.";
+        }
+
+        String type = source.getPouvoir().getType();
+        switch (type) {
+
+            case "CR": // Croissance
+                if (source.getNom().equals("Louveteau")){
+                    source.modifierNom("Loup");
+                    source.ajouterCoutSang(1);
+                    source.ajouterAttack(2);
+                    source.modifierVie(-3);
+
+                    source.setPouvoir(null);
+                    return "Le louveteau a grandi en Loup !";
+                }
+                return "Problème de croissance";
+
+            case "CM": // Contact Mortel
+                if (cible != null && cible.estAnimal()) {
+                    int vieActuelle = cible.getVie();
+                    cible.modifierVie(vieActuelle);
+                    return "Contact mortel : " + cible.getNom() + " meurt instantanément.";
+                }
+                return "Contact mortel sans effet.";
+
+            case "P": // Puant
+                if (cible != null && cible.estAnimal()){
+                    ((Animal)cible).ajouterAttack(-1);
+                    return "Pouvoir Puant : Attaque de " + cible.getNom() + " réduite de 1.";
+                }
+                return "Pouvoir puant sans effet.";
+
+            case "PP": //
+                if (cible != null && cible.estAnimal()) {
+                    cible.modifierVie(1);
+                    return "Piques pointues : " + cible.getNom() + " subit 1 dégât en retour.";
+                }
+                return "Piques pointues : aucun effet.";
+
+            case "C": // Coureur
+                int posActuelle = getPosition(source);
+                if (posActuelle < 3 && this.aPlace(posActuelle + 1)){
+                    this.changerSlot(source, posActuelle + 1);
+                    return "Pouvoir Coureur : Déplacement à droite.";
+                }
+                else if (posActuelle > 0 && this.aPlace(posActuelle - 1)) {
+                    this.changerSlot(source, posActuelle - 1);
+                    return "Pouvoir Coureur : Déplacement à gauche.";
+                }
+                return "Pouvoir Coureur : Bloqué, déplacement impossible.";
+
+            case "NV":
+                return "Géré au moment de la mort.";
+
+            default:
+                return "Erreur pouvoir non géré !";
         }
     }
 
@@ -135,15 +214,32 @@ public class Adversaire {
     }
 
     public void verifierMorts() {
-        for (int i = 0; i < m_ligneE.size(); i++) {
-            Carte c = m_ligneE.get(i);
-            if (c != null && !c.estVie()) {
-                m_ligneE.set(i, null);
+        for (int i = 0; i < this.m_ligneE.size(); i++) {
+            Carte c = this.m_ligneE.get(i);
+
+            if (c != null && c.estAnimal()) {
+                Animal animal = (Animal) c;
+
+                if (animal.getVie() <= 0) {
+
+                    if (animal.getPouvoir() != null && animal.getPouvoir().getType().equals("NV") && animal.getPouvoir().getActive() > 0) {
+
+                        animal.getPouvoir().modifActive(-1);
+
+                        animal.modifierVie(-animal.getInitVie());
+
+                        System.out.println(animal.getNom() + " a survécu grâce à ses Nombreuses Vies ! Vies restantes : " + animal.getPouvoir().getActive());
+                        continue;
+                    }
+
+                    this.m_ligneE.set(i, null);
+                }
+            } else if (c != null && !c.estVie()) {
+                this.m_ligneE.set(i, null);
             }
         }
     }
     public boolean estCaseLibre(int pos) {
-        // Vérifie si la case dans la ligne active est vide
         return this.m_ligneE.get(pos) == null;
     }
 
