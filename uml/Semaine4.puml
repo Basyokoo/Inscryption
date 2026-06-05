@@ -13,62 +13,101 @@ package jeu {
     package logic {
         class GestionPartie {
             - m_numPartie : Integer
-            - m_victoire : Integer
+            - m_victoireJ : Integer
+            - m_victoireE : Integer
             - m_numTour : Integer
             - m_j : Joueur
             - m_adv : Adversaire
             - m_affichage : AffichageConsole
+            - m_combat : Combat
             - m_action : String
             - m_score : Score
+            - piocherTour = true : Boolean
+            - m_messageAlerteCOurant = " " : String
             + <<create>> GestionPartie()
             + lancerJeu() : Boolean
+            + preparerNouvelleManche()
+            + verifMort(adv : Adversaire, jou : Joueur)
             + debutTour() : Boolean
+            + demanderActionJoueur()
             + boucleTour() : Boolean
+            + finTour()
             + rafraichirEcran()
-            + verifFinPartie() : Boolean
-            + finPartie() : Boolean
+            + sacrifice() : Boolean
+            + placerCarte() : Boolean
             + gererPierreSacrifice()
-            + getNumPartie() : Integer
+            + verifFinManche() : Boolean
+            + finManche() : Boolean
+            + finPartie() : Boolean
+            + verifFinPartie() : Boolean
         }
         class Score {
-            - m_score : Integer
+            - m_balanceScore : Integer
             + <<create>> Score()
             + ajouterPointsJoueur(points : Integer)
             + ajouterPointsEnnemi(points : Integer)
             + getValeurEcart() : Integer
             + estVictoireJoueur() : Boolean
             + estVictoireEnnemi() : Boolean
-            + getScore() : String
+            + getScoreJoueur() : String
+            + getScoreEnnemi() : String
+            + setvaleurJoueur(nouvelleValeur : Integer)
+            + setValeurEnnemi(nouvelleValeur : Integer)
         }
         class Combat {
             + gererAttaqueFinTour(joueur : Joueur, adversaire : Adversaire, score : Score)
             - executerAttaque(attaquant : Carte, cible : Carte, position : Integer, estEnnemi : boolean, resume : StringBuilder, score : Score) : Integer
-            + appliquerDegats(attaquant : Animal, cible : Carte, position : Integer) : Integer        }
+            + appliquerDegats(attaquant : Animal, cible : Carte) : Integer
         }
         class Joueur {
             - m_cartesEnMain : ArrayList<Animal>
             - m_ligneJ : ArrayList<Carte>
             - m_pioche : ArrayList<Animal>
             - nbOsDisponibles : Integer
+            - nbSangDisponibles : Integer
             - isNull : boolean
-            - m_nbobsJ = 0 : Integer
+            - m_nbCartePioche = 0 : Integer
             - m_pouvoir : ArrayList<Pouvoir>
+            - m_pouvoirADonner : ArrayList<Pouvoir>
             + <<create>> Joueur()
+            + getNbOsDisponibles() : Integer
+            + ajouterOs(quantite : Integer)
+            + consommerOs(quantite : Integer)
+            + ajouterSang(quantite : Integer)
+            + consommerSang(quantite : Integer)
             + initialiserPiocheDeBase()
             + piocher() : Animal
             + ajoutercartes(carte : Animal)
+            + ajouterCartesMain(carte : Animal)
             + getNombreCartes() : Integer
+            + addPvr(p : Pouvoir) : Boolean
+            + setSangJoueur(i : Integer)
+            + setNbOsDisponibles(i : Integer)
+            + incrSang()
+            + tuer(index : Integer)
+            + getPvrType(index : Integer)
             + ajoutermain(carte : Animal, index : Integer)
-            + placerCarteJoueur(c : Carte, pos : Integer)
-            + retirerMain(carte : Animal)
-            + ajouterOs((quantite : Integer)
-            + consommerOs(quantite : Integer)
+            + changerSlot(c : Carte, pos : Integer) : String
+            + placerCarteJoueur(c : Carte, pos : Integer) : Boolean
+            + enleverCarteJoueurPlateau(index : Integer) : Boolean
+            + enleverCarteJoueur(index : Integer) : Boolean
             + getCartesEnMain() : ArrayList<Animal>
-            + getNbOsDisponibles() : Integer
             + genererPioche() : String
+            + getPosition(c : Carte) : Integer
             + creeMain() : String
-            + aPlace() : boolean
-            + placerObst() : boolean
+            + aPlace() : Boolean
+            + aPlaceCarte(index : Integer) : Boolean
+            + placerObst() : Boolean
+            + getCarteJoueur(place : Integer)
+            + getSangJoueur() : Integer
+            + getCartesLigenBas() : ArrayList<Carte>
+            + getCartesLigneBas(index : Integer) : Carte
+            + verifierMorts()
+            + clear()
+            + appliquerPouvoir(source : Animal, cible : Carte)
+            + creeMain() : String
+            + aPlace() : Boolean
+            + placerObst() : Boolean
             + getCarteJoueur(place : Integer) : Carte
             + getCartesLigenBas() : ArrayList<Carte>
             + verifierMorts()
@@ -78,34 +117,48 @@ package jeu {
             - m_listeE : ArrayList<Carte>
             - m_ligneEPT : ArrayList<Carte>
             - m_pouvoir : ArrayList<Pouvoir>
-            - m_nbObsE : Integer
+            - m_nbObsE  = 0 : Integer
             + <<create>> Adversaire()
             + placerCarteEnnemi(c : Carte, pos : integer)
             + setCarteIntention(c : Carte, pos : Integer)
-            + avancerLigne() : boolean
-            + getCarteEnnemi(place : Integer) : Carte
+            + avancerLigne() : Boolean
+            + clear()
+            + addCarte(ani : Animal)
+            + getCarteEnnemi(place : Integer)
             + getCartesIntentions() : ArrayList<Carte>
             + getCartesLigneHaut() : ArrayList<Carte>
-            + getActionsPlani() : Carte[]
-            + planifierProchainTour(numTour : Integer)
+            + planifierProchainTour()
             + envoyerIntentionsAuPlateau()
-            + placerObst() : boolean
+            + aPlace(index : Integer) : Boolean
+            + changerSlot(c : Carte, pos : Integer) : String
+            + getPosition(c : Carte) : Integer
+            + appliquerPouvoir(source : Animal, cible : Carte) : String
+            + placerObst() : Boolean
             + verifierMorts()
+            + estCaseLibre(pos : Integer)
         }
     }
 
     package model {
         abstract class Carte <<abstract>> {
             - m_nom : String
-            - m_pointsVie : Integer
-            - m_type : String
+            - m_pointsVie = 0 : Integer
+            - m_vieInit = 0 : Integer
             - m_Attack  = 0 : Integer
             + <<create>> Carte(m : String, num : Integer, type : String)
             + <<create>> Carte(m : String, num : Integer, type : String, degat : Integer)
+            + getInitVie() : Integer
             + getNom() : String
             + getVie() : Integer
-            + modifierVie(changement : Integer)
+            + modifierNom(n : String) : String
+            + modifierVie(changement : Integer) : String
+            + ajouterVie(changement : Integer) : String
             + setPouvoir(p : Pouvoir)
+            + estAnimal() : Boolean
+            + getVolant() : Boolean
+            + getPouvoir() : Pouvoir
+            + ajouterAttack(i : Integer)
+            + getAttack() : Integer
             + estVie() : Boolean
             + toString() : String
         }
@@ -117,25 +170,37 @@ package jeu {
             - m_volant : Boolean
             - m_pouvoir = null : Pouvoir
             + <<create>> Animal(ani : Animal)
-            + <<create>> Animal(nom : String, pv : Integer, att : Integer, sang : Integer, os : Integer, volant : Boolean)
-            + <<create>> Animal(nom : String, pv : Integer, att : Integer, sang : Integer, os : Integer, volant : Boolean, p : Pouvoir)
+            + <<create>> Animal(nom : String, pv : Integer, pointsAttaque : Integer, sang : Integer, os : Integer, volant : Boolean)
+            + <<create>> Animal(nom : String, pv : Integer, pointsAttaque : Integer, sang : Integer, os : Integer, volant : Boolean, p : Pouvoir)
             + getAttack() : Integer
             + getCoutSang() : Integer
             + getCoutOs() : Integer
-            + getVolant() : Boolean
+            + ajouterCoutSang(i : Integer) : String
             + setPouvoir(p : Pouvoir) : String
+            + estAnimal() : Boolean
+            + getVolant() : Boolean
             + getPouvoir() : Pouvoir
+            + ajouterAttack(i : Integer)
+
         }
 
         class Obstacle extends Carte {
             + <<create>> Obstacle(nom : String, pv : Integer)
             + setPouvoir(p : Pouvoir) : String
+            + estAnimal() : Boolean
+            + getVolant() : Boolean
+            + getPouvoir() : Pouvoir
+            + ajouterAttack(i : Integer)
+            + getAttack() : Integer
         }
         class Pouvoir{
             - m_type : String
             - m_nom : String
             - m_activeDans = 0 : Integer
             + <<create>> Pouvoir(nom : String, type : String, active : Integer)
+            + getActive() : Integer
+            + modifActive(i : Integer) : String
+            + getType() : String
         }
     }
 
@@ -150,16 +215,21 @@ package jeu {
             - m_decalageDynamique : Integer
             - m_margeGauche : Integer
             - m_ligneBoiteSaisie : Integer
+            - m_historiqueLogs = new ArrayList<> : ArrayList<String>
             + initEcran() : Boolean
             + mettreAJourDimensions()
             + getColDep(coor : Integer)
-            + dessinerJeuSansPlateau(cartesterrainJoueur : ArrayList<Carte>, intentionsAdversaire : ArrayList<Carte>, cartesterrainAdversaire : ArrayList<Carte>, joueur : jeu.logic.joueur, score : Integer)
+            + ajouterLog(message : String)
+            + dessinerCarteLogs(ligneDebut)
+            + dessinerJeuSansPlateau(cartesterrainJoueur : ArrayList<Carte>, intentionsAdversaire : ArrayList<Carte>, cartesterrainAdversaire : ArrayList<Carte>, joueur : jeu.logic.joueur, score : Integer, numPartie : Integer, victoireJ : Integer, victoireE : Integer)
+            + updatePioche(coor : Integer, ligne : Integer, joueur : Joueur)
             + afficherMessageAlerte(message : String)
             + afficherChoix() : String
             + dessineCarte(c : Carte, ligneDep : Integer, coor : Integer) : Boolean
             + dessinerCarteVide(label : String, ligneDebut : Integer, coordonnee : Integer)
             + rafraichir()
             + effacer()
+            + afficherFin(entiteGagnante : Object, estFinpartieTotale : Boolean)
         }
     }
 }
