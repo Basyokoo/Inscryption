@@ -105,12 +105,6 @@ package jeu {
             + verifierMorts()
             + clear()
             + appliquerPouvoir(source : Animal, cible : Carte)
-            + creeMain() : String
-            + aPlace() : Boolean
-            + placerObst() : Boolean
-            + getCarteJoueur(place : Integer) : Carte
-            + getCartesLigenBas() : ArrayList<Carte>
-            + verifierMorts()
         }
         class Adversaire {
             - m_actionsPlanifiees : Carte[*]
