@@ -22,4 +22,8 @@ public class Pouvoir {
     public String getType() {
         return m_type;
     }
+
+    public String getNom() {
+        return this.m_nom;
+    }
 }

@@ -411,4 +411,7 @@ public class GestionPartie {
     public boolean verifFinPartie() {
         return m_victoireJ >= 2 || m_victoireE >= 2;
     }
+    public Score getScore() { return this.m_score; }
+    public int getNumTour() { return this.m_numTour; }
+    public String getMessageAlerteCourant() { return this.m_messageAlerteCourant; }
 }

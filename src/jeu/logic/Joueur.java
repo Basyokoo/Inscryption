@@ -349,7 +349,5 @@ public class Joueur {
                 return "Erreur pouvoir non géré !";
         }
     }
-
-
 }
 
