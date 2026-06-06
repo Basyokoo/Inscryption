@@ -44,6 +44,9 @@ package jeu {
             + finManche() : Boolean
             + finPartie() : Boolean
             + verifFinPartie() : Boolean
+            + getScore() : Score
+            + getNumTour() : Integer
+            + getMessageAlertCourant() : String
         }
         class Score {
             - m_balanceScore : Integer
@@ -57,9 +60,6 @@ package jeu {
             + getScoreEnnemi() : String
             + setvaleurJoueur(nouvelleValeur : Integer)
             + setValeurEnnemi(nouvelleValeur : Integer)
-            + getScore() : Score
-            + getNumTour() : Integer
-            + getMessageAlertCourant() : String
         }
         class Combat {
             + gererAttaqueFinTour(joueur : Joueur, adversaire : Adversaire, score : Score)
