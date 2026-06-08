@@ -14,13 +14,20 @@ package jeu {
         class GestionPartie {
             - m_numPartie : Integer
             - victoire : Integer
-            + debutPartie()
-            + boucleTour()
-            + verifierFinPartie() : Boolean
-            + finPartie()
-            + proposerCartes()
-            + initialiserPlateau()
-            + lancerJeu()
+            - m_numTour : Integer
+            - m_plat : Plateau
+            - m_j : Joueur
+            - m_pioche : Pioche
+            - m_main : MainJoueur
+            - m_adv : Adversaire
+            - m_affichage : AffichageConsole
+            + <<create>> GestionPartie()
+            + lancerJeu() : Boolean
+            + debutTour() : Boolean
+            + boucleTour() : Boolean
+            + verifFinPartie() : Boolean
+            + finPartie() : Boolean
+            + propCarte() : Boolean
         }
         class Score {
             - m_score : Integer
@@ -33,9 +40,9 @@ package jeu {
                 }
         class Combat {
             + gererAttaqueFinTour(plateau : Plateau) : String
+            - executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume) : Integer
             + appliquerDegats(attaquant : Animal, cible : Carte, position : Integer) : Integer
             + verifierMorts(plateau : Plateau, mainJoueur : MainJoueur, mainAdversaire : MainJoueur)
-            - executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume) : Integer
         }
     }
 
@@ -43,10 +50,13 @@ package jeu {
         abstract class Carte <<abstract>> {
             - m_nom : String
             - m_pointsVie : Integer
-            + <<create>> Carte(nom : String, pv : Integer)
+            - m_type : String
+            - m_Attack  = 0 : Integer
+            + <<create>> Carte(m : String, num : Integer, type : String)
+            + <<create>> Carte(m : String, num : Integer, type : String, degat : Integer)
             + getNom() : String
             + getVie() : Integer
-            + setPV(pv : Integer)
+            + modifierVie(changement : Integer)
             + estVivant() : Boolean
             + toString() : String
         }
@@ -57,7 +67,7 @@ package jeu {
             - m_coutOs : Integer
             - m_volant : Boolean
             + <<create>> Animal(nom : String, pv : Integer, att : Integer, sang : Integer, os : Integer, volant : Boolean)
-            + getPointsAttaque() : Integer
+            + getAttack() : Integer
             + getCoutSang() : Integer
             + getCoutOs() : Integer
             + getVolant() : Boolean
@@ -68,20 +78,26 @@ package jeu {
         }
 
         class Plateau {
-            - m_ligneJoueur : Carte[4]
-            - m_ligneEnnemi : Carte[4]
-            - m_ligneProchainTour : Carte[4]
+            - m_ligneJ : ArrayList<Carte>
+            - m_ligneE :  ArrayList<Carte>
+            - m_ligneEPT : ArrayList<Carte>
+            - m_nbObsE = 0 : Integer
+            - m_nbobsJ = 0 : Integer
             + <<create>> Plateau()
-            + placerCarteJoueur(carte : Carte, position : Integer) : Boolean
-            + placerCarteEnnemi(carte : Carte, position : Integer) : Boolean
+            + placerCarteJoueur(c : Carte, pos: Integer) : Boolean
+            + placerCarteEnnemi(c : Carte, pos : Integer) : Boolean
+            + setCarteintention(c : Carte, pos : Integer) : Boolean
             + avancerLigne() : Boolean
             + placerObst() : Boolean
-            + getCarteJoueur(position : Integer) : Carte
-            + getCarteEnnemi(position : Integer) : Carte
+            + getCarteJoueur(place : Integer) : Carte
+            + getCarteEnnemi(place : Integer) : Carte
+            + getCartesIntentions() : ArrayList<Carte>
+            + getCartesLigneHaut() : ArrayList<Carte>
+            + getCartesLignebas() : ArrayList<Carte>
         }
 
         class Pioche {
-            - m_cartes : Animal[*]
+            - m_cartes : ArrayList<Carte>
             + <<create>> Pioche()
             + initialiserPiocheDeBase()
             + piocher() : Animal
@@ -90,39 +106,45 @@ package jeu {
         }
 
         class MainJoueur {
-            - m_cartesEnMain : Animal[*]
+            - m_cartesEnMain : ArrayList<Animal>
             - m_nbOsDisponibles : Integer
             + <<create>> MainJoueur()
             + ajouterMain(carte : Animal)
-            + retirerMain(index : Integer) : Animal
+            + retirerMain(carte : Animal)
             + ajouterOs(quantite : Integer)
             + consommerOs(quantite : Integer)
-            + getCartes() : Animal[*]
-            + getNbOs() : Integer
+            + getNbOsDisponibles() : Integer
         }
 
         class Joueur {
+            + <<create>> Joueur()
             + choisirAction() : String
         }
 
         class Adversaire {
             - m_actionsPlanifiees : Carte[*]
+            + getActionsPlani() : Carte[*]
             + planifierProchainTour(numTour : Integer)
+            + envoyerIntentionsAuPlateau(plateau : Plateau)
             + executerTour(plateau : Plateau)
         }
     }
 
     package view {
         class AffichageConsole {
-            - m_tableauCaractere : ArrayList<ArrayList<Caractere>>
+            - m_SIZE_CARTE = 13 : Integer
+            - m_SIZE_DECALAGE = 3 : Integer
+            - m_HAUTEUR_CARTE = 7 : Integer
+            - m_LARGEUR_ECRAN = m_SIZE_CARTE * 4 + m_SIZE_DECALAGE * 3 + 10 : Integer
+            - m_HAUTEUR_ECRAN = m_HAUTEUR_CARTE * 4 + 10 : Integer
+            - m_screen : Screen
+            - m_graphics : TextGraphics
             + initEcran() : Boolean
-            + ecrireChar(ligne : Integer, col : Integer, c : Char) : Boolean
-            + ecrireTexte(ligne : Integer, col : Integer, mot : String) : Boolean
-            + getColDep(coor : Integer) : Integer
-            + dessineCarte(c : Carte, ligneDep : Integer, coor : Integer)
-            + afficherPlateau(plateau : Plateau, score : Integer, pioche : Pioche, main : MainJoueur)
-            + afficherMessageDegats(messages : String)
-            + afficherErreurSaisie(message : String)
+            + getColDep(coor : Integer)
+            + dessinerJeuComplet(plateau : Plateau, main : MainJoueur, score : Integer)
+            + dessineCarte(c : Carte, ligneDep : Integer, coor : Integer) : Boolean
+            + rafraichir()
+            + effacer()
         }
     }
 }

@@ -1,78 +1,66 @@
 package jeu.logic;
 
-import jeu.model.Plateau;
-import jeu.model.Carte;
-import jeu.model.Animal;
-import jeu.model.MainJoueur;
-import java.util.ArrayList;
-import java.util.List;
+import jeu.model.*;
 
 public class Combat {
 
-    public String gererAttaquesFinTour(Plateau plateau) {
+    public String gererAttaqueFinTour(Joueur joueur, Adversaire adversaire, Score score) {
         StringBuilder resumeCombat = new StringBuilder("--- Phase de Combat ---\n");
-        int totalDegatsJoueur = 0;
-        int totalDegatsEnnemi = 0;
 
+        // 1. Attaque du joueur vers l'adversaire
         for (int i = 0; i < 4; i++) {
-            int degatsJ = executerAttaque(plateau.getCarteJoueur(i), plateau.getCarteEnnemi(i), i, false, resumeCombat);
-            totalDegatsJoueur += degatsJ;
-            int degatsE = executerAttaque(plateau.getCarteEnnemi(i), plateau.getCarteJoueur(i), i, true, resumeCombat);
-            totalDegatsEnnemi += degatsE;
+            executerAttaque(joueur.getCartesLigneBas().get(i),
+                    adversaire.getCartesLigneHaut().get(i), i, false, resumeCombat, score);
         }
-        resumeCombat.append(String.format("Fin du combat. Dégâts totaux du joueur : %d | Ennemi : %d",
-                totalDegatsJoueur, totalDegatsEnnemi));
+
+        adversaire.verifierMorts();
+
+        // 2. Attaque de l'adversaire vers le joueur
+        for (int i = 0; i < 4; i++) {
+            executerAttaque(adversaire.getCartesLigneHaut().get(i),
+                    joueur.getCartesLigneBas().get(i), i, true, resumeCombat, score);
+        }
+
+        joueur.verifierMorts();
+
         return resumeCombat.toString();
     }
 
-    private int executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume) {
-        if (!(attaquant instanceof Animal) || !attaquant.estVie()) {
-            return 0;
-        }
-        Animal animalAttaquant = (Animal) attaquant;
-        int degatsInfliges = appliquerDegats(animalAttaquant, cible, position);
-        if (degatsInfliges > 0) {
-            String prefixe = estEnnemi ? "L'ennemi " : "";
-            resume.append(prefixe)
-                    .append(animalAttaquant.getNom())
-                    .append(" inflige ")
-                    .append(degatsInfliges)
-                    .append(" dégâts en position ")
-                    .append(position).append(".\n");
-        }
-        return degatsInfliges;
-    }
-    public Integer appliquerDegats(Animal attaquant, Carte cible, Integer position) {
-        if (attaquant == null || attaquant.getAttack() <= 0) {
-            return 0;
-        }
-        if (position < 0 || position > 3) {
-            return 0;
-        }
-        int puissance = attaquant.getAttack();
-        if (cible != null && cible.estVie()) {
-            if (attaquant.getVolant() && (cible instanceof Animal && !((Animal) cible).getVolant())) {
-                return puissance;
-            }
-            cible.modifierVie(cible.getVie() - puissance);
-        }
-        return puissance;
-    }
-    public void verifierMorts(Plateau plateau, MainJoueur mainJoueur, MainJoueur mainAdversaire) {
-        for (int i = 0; i < 4; i++) {
-            Carte carteJoueur = plateau.getCarteJoueur(i);
-            if (carteJoueur != null && !carteJoueur.estVie()) {
-                mainJoueur.ajouterOs(1);
-                plateau.placerCarteJoueur(null, i);
-            }
-            Carte carteEnnemi = plateau.getCarteEnnemi(i);
-            if (carteEnnemi != null && !carteEnnemi.estVie()) {
-                if (mainAdversaire != null) {
-                    mainAdversaire.ajouterOs(1);
-                }
+    private void executerAttaque(Carte attaquant, Carte cible, int position, boolean estEnnemi, StringBuilder resume, Score score) {
+        if (attaquant == null || !(attaquant.estAnimal()) || !attaquant.estVie()) return;
 
-                plateau.placerCarteEnnemi(null, i);
+        Animal animalAttaquant = (Animal) attaquant;
+        int degats = animalAttaquant.getAttack();
+
+        if (animalAttaquant.getVolant() || cible == null || !cible.estVie()) {
+            if (!estEnnemi) {
+                score.ajouterPointsJoueur(degats);
+                if (animalAttaquant.getVolant()) {
+                    resume.append(animalAttaquant.getNom()).append(" survole la ligne et attaque le score adverse pour ").append(degats).append(" pts.\n");
+                } else {
+                    resume.append(animalAttaquant.getNom()).append(" attaque le score pour ").append(degats).append(" pts.\n");
+                }
+            } else {
+                score.ajouterPointsEnnemi(degats);
+                if (animalAttaquant.getVolant()) {
+                    resume.append("L'ennemi ").append(animalAttaquant.getNom()).append(" survole votre ligne et vous attaque pour ").append(degats).append(" pts.\n");
+                } else {
+                    resume.append("L'ennemi ").append(animalAttaquant.getNom()).append(" attaque votre score pour ").append(degats).append(" pts.\n");
+                }
             }
+            return;
         }
+
+        int degatsInfliges = appliquerDegats(animalAttaquant, cible);
+        resume.append(animalAttaquant.getNom()).append(" attaque ").append(cible.getNom())
+                .append(" pour ").append(degatsInfliges).append(" pts.\n");
+    }
+
+    public int appliquerDegats(Animal attaquant, Carte cible) {
+        int puissance = attaquant.getAttack();
+
+        cible.modifierVie(puissance);
+
+        return puissance;
     }
 }

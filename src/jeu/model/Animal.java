@@ -5,13 +5,32 @@ public class Animal extends Carte{
     protected int m_coutSang;
     protected int m_coutOs;
     protected boolean m_volatile;
+    private Pouvoir m_pouvoir = null;
 
+
+    public Animal(Animal ani){
+        super(ani.getNom(), ani.getVie(), "ANI");
+        this.m_pointsAttaque = ani.getAttack();
+        this.m_coutOs = ani.getCoutOs();
+        this.m_coutSang = ani.getCoutSang();
+        this.m_volatile = ani.getVolant();
+        this.m_pouvoir = ani.getPouvoir();
+    }
     public Animal(String nom, int pV, int pointsAttaque, int sang, int os, boolean volant) {
         super(nom,pV,"ANI");
         this.m_pointsAttaque = pointsAttaque;
         this.m_coutSang = sang;
         this.m_coutOs = os;
         this.m_volatile = volant;
+    }
+
+    public Animal(String nom, int pV, int pointsAttaque, int sang, int os, boolean volant, Pouvoir p) {
+        super(nom,pV,"ANI");
+        this.m_pointsAttaque = pointsAttaque;
+        this.m_coutSang = sang;
+        this.m_coutOs = os;
+        this.m_volatile = volant;
+        this.m_pouvoir = p;
     }
 
     public int getAttack(){
@@ -23,7 +42,38 @@ public class Animal extends Carte{
     public int getCoutOs(){
         return this.m_coutOs;
     }
-    public boolean getVolant(){
-        return this.m_volatile;
+
+    public String ajouterCoutSang(int i){
+        this.m_coutSang += i;
+        return "Changement du cout de sang fait";
+    }
+
+    public String setPouvoir(Pouvoir p) {
+        this.m_pouvoir = p;
+        return null;
+    }
+
+    @Override
+    public boolean estAnimal() {
+        return true;
+    }
+
+    @Override
+    public boolean getVolant() {
+        return m_volatile;
+    }
+
+    @Override
+    public Pouvoir getPouvoir(){
+        if (this.m_pouvoir == null){
+            return null;
+        }else{
+            return this.m_pouvoir;
+        }
+    }
+
+    @Override
+    public void ajouterAttack(int i) {
+        this.m_pointsAttaque += i;
     }
 }
